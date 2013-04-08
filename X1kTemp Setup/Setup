@@ -1,0 +1,617 @@
+; ©2005 Alexandre BALABAN (made with GoldED Studio AIX Installation wizard, ©2005 Dietmar Eilert)
+
+; /// identify language
+; ------------------------------------------------------------------------------
+
+; normalize language names (OS4 uses "german", OS3 and MorphOS use "deutsch")
+
+(if (= @language "deutsch")
+
+    (set @language "german")
+)
+
+(if (= @language "français")
+
+    (set @language "french")
+)
+
+; ///
+; /// strings
+; ------------------------------------------------------------------------------
+
+; set escape sequence for proprtional font (if supported)
+
+(if (= @installer-version 0)
+
+    (set #string_esc "")
+    (set #string_esc "[2p")
+)
+
+; english strings
+
+(
+    (
+        (set #string_installer                "The installer program on your system (%ld.%ld) is too old!\n\nThis script needs installer version 43 or better. You can find a suitable version on your OS CD or in the OS3.9 NDK. When upgrading installer, do not leave older versions installed on your system (for example a new version in c: and an older version is sys:tools)!")
+
+        (set #string_path                     "Choose a path for installation:")
+        (set #string_path_newdir              "Choose a path for installation. The setup program will create the directory «%s» in the path you specify:")
+
+        (set #string_selectfile               "Select a file:")
+        (set #string_selectdirectory          "Select a directory:")
+
+        (set #string_createdirerror           "Can not create directory:\n%s")
+
+        (set #string_runcommanderror          "WARNING: \"%s\" has returned error code %ld!\n\nCommand line:\n%s")
+
+        (set #string_uninstall_yes            "UNINSTALL")
+        (set #string_uninstall_no             "Skip")
+
+        (set #string_again                    "TRY AGAIN")
+        (set #string_skip                     "Skip")
+        (set #string_ignore                   "Ignore")
+
+        (set #string_success                  "Installation complete!\n\nThe software has been installed.")
+        (set #string_success_verbose          "Installation complete!\n\nThe software has been installed in:\n\"%s\"")
+
+        (set #string_old                      "The installed version is too old to be upgraded. Please uninstall the old version and repeat this installation.")
+
+        (set #string_welcome                  "Welcome to X1kTemp.docky Setup!\n\nThis program installs X1kTemp Docky 53.3 on your computer.")
+        (set #string_welcome_install          "INSTALL")
+
+        (set #string_license                  "LICENSE\nX1kTemp Docky 53.3 ©2013 Alexandre BALABAN, All Rights Reserved.\nTHIS SOFTWARE IS PROTECTED BY INTERNATIONAL AND NATIONAL LAWS. UNAUTHORIZED DISTRIBUTION OR RENTAL OF THIS SOFTWARE OR ONE OF ITS COMPONENTS ARE PROSECUTED TO THE FULLEST EXTENT POSSIBLE. FOR FULL COPYRIGHT INFORMATION, PLEASE READ THE INCLUDED LICENSE DOCUMENT.")
+        (set #string_license_accept           "I accept the terms of the license agreement")
+
+        (set #studio_installerror             "An error has occured during the installation. The error description can be found in the logfile t:install.logfile (if log file creation has been enabled). The error code is:\n\n%ld\n\nIf the problem persists after repeating the installation, please contact alexandre@balaban.fr.")
+
+        (set #string_os                       "%s is not compatible with the operating system installed on this computer!")
+        (set #string_cpu                      "%s is not compatible with the CPU installed in your computer!")
+
+        (set #string_components_install       "Choose the components to be installed\n\n(Page %ld of %ld):")
+        (set #string_components_update        "Choose the components to be installed or updated\n\n(Page %ld of %ld):")
+        (set #string_components_help          "Choose the components you want to have installed.")
+
+        (set #string_components_software      "Software")
+        (set #string_components_manuals       "Manuals")
+
+        (set #string_startup                  "Make required changes to the s:user-startup file of your computer?")
+    )
+)
+
+; ///
+; /// procedures
+; ------------------------------------------------------------------------------
+
+; run command and display error (in case of failure)
+
+(procedure p_runcommand #runcommand_cmd #runcommand_args
+
+    (
+        ; make a unique file name
+
+        (set #runcommand_out ("t:%s.run" #short))
+
+        ; execute command (loop until successful)
+
+        (set #runcommand_rc 20)
+
+        (until (= #runcommand_rc 0)
+
+            (
+                (delete #runcommand_out)
+
+                (set #runcommand_rc (run ("%s >\"%s\" %s" #runcommand_cmd #runcommand_out #runcommand_args)))
+
+                (if (> #runcommand_rc 5)
+
+                    (
+                        ; show error message
+
+                        (if (exists #runcommand_out)
+
+                            (run ("copy \"%s\" con:////Error/AUTO/WAIT/CLOSE" #runcommand_out))
+                        )
+
+                        ; try again?
+
+                        (set #runcommand_rc
+
+                            (askbool
+
+                                (prompt (#string_runcommanderror #runcommand_cmd #runcommand_rc (cat #runcommand_cmd " " #runcommand_args)))
+
+                                (help @askbool-help)
+
+                                (choices
+
+                                    #string_again
+                                    #string_ignore
+                                )
+
+                                (default 0)
+                            )
+                        )
+                    )
+
+                    ; ELSE
+
+                    (set #runcommand_rc 0)
+                )
+            )
+        )
+
+        (delete #runcommand_out)
+    )
+)
+
+; create directory (any depth, missing dir levels are created)
+
+(procedure p_makedir #makedir_path #makedir_infos
+
+    (
+        (if (not (exists #makedir_path))
+
+            (if (<> #makedir_path "")
+
+                (
+                    ; try to create dir directly ; if that fails, create missing dir levels
+
+                    (if (= #makedir_infos @true)
+
+                        (makedir #makedir_path (infos))
+                        (makedir #makedir_path)
+                    )
+
+                    (if (not (exists #makedir_path))
+
+                        (
+                            (set #makedir_pos 0)
+
+                            (set #makedir_eol (- (strlen #makedir_path) 1))
+
+                            (while (<= #makedir_pos #makedir_eol)
+
+                                (
+                                    (set #makedir_next (substr #makedir_path #makedir_pos 1))
+
+                                    (if (or (= #makedir_next "/") (= #makedir_pos #makedir_eol))
+
+                                        (
+                                            (if (= #makedir_next "/")
+
+                                                (set #makedir_next (substr #makedir_path 0 (- #makedir_pos 1)))
+                                                (set #makedir_next (substr #makedir_path 0    #makedir_pos   ))
+                                            )
+
+                                            (if (= #makedir_infos @true)
+
+                                                (makedir #makedir_next (infos))
+                                                (makedir #makedir_next)
+                                            )
+
+                                            (if (not (exists #makedir_next))
+
+                                                (abort (#string_createdirerror #makedir_next))
+                                            )
+                                        )
+                                    )
+
+                                    (set #pos (+ #pos 1))
+                                )
+                            )
+                        )
+                    )
+                )
+
+                ; ELSE
+
+                (abort (#string_createdirerror #makedir_path))
+            )
+        )
+    )
+)
+
+; check that required software is installed
+
+(procedure p_versioncheck #versioncheck_file #versioncheck_major #versioncheck_minor
+
+    (if (exists #versioncheck_file (noreq))
+
+        (
+            (set #versioncheck_required (+ (* #versioncheck_major 65536) #versioncheck_minor))
+
+            (if (>= (getversion #versioncheck_file) #versioncheck_required)
+
+                (set #result @true )
+                (set #result @false)
+            )
+        )
+
+        ; ELSE
+
+        (set #result @true)
+    )
+)
+
+; ///
+; /// error handler
+; ------------------------------------------------------------------------------
+
+(onerror
+
+    (
+        (if (> @ioerr 0)
+
+            (message (#studio_installerror @ioerr))
+        )
+
+        (exit (quiet))
+    )
+)
+
+; ///
+; /// constants
+; ------------------------------------------------------------------------------
+
+; internal use (do not edit)
+
+(set @true                       1)
+(set @false                      0)
+
+(set @license_decline            0)
+(set @license_accept             1)
+
+(set @variant_max                1)
+
+(set @components_software        1)
+(set @components_manuals         2)
+
+(set @os_1                       1)
+(set @os_2                       2)
+(set @os_3                       4)
+(set @os_4                       8)
+(set @os_mos                    16)
+
+(set @cpu_68000                  1)
+(set @cpu_68010                  2)
+(set @cpu_68020                  4)
+(set @cpu_68030                  8)
+(set @cpu_68040                 16)
+(set @cpu_68060                 32)
+(set @cpu_ppc                   64)
+
+; configure
+
+(set @app-name                  "X1kTemp Docky 53.3")
+(set @name                      "X1kTemp Docky 53.3")
+(set @short                     "X1kTemp.docky")
+(set @envs                      "X1kTemp.docky")
+
+(set @querytarget                @false) ; let user choose install path?
+(set @variants                   @false) ; let user choose install variant?
+(set @components                 @true ) ; let user choose install components?
+(set @uninstallable              @false) ; let user uninstall?
+(set @envpath                    @false) ; store path in env variable?
+(set @envname                    @false) ; store name in env variable?
+(set @envserial                  @false) ; store serial in env variable?
+(set @require_os                 (+ @os_4))
+(set @require_cpu                (+ @cpu_ppc))
+(set @components_min             (+ 0))
+(set @components_typical         (+ 0))
+(set @components_max             (+ @components_software @components_manuals))
+(set @components_custom          (+ 0))
+(set @components_firstinstall    (+ 0))
+
+; ///
+; /// variables
+; ------------------------------------------------------------------------------
+
+(set #variant   @variant_max     )
+(set #upgrading @false           )
+(set #installed ""               )
+(set #target    "SYS:Utilities/Dockies")
+
+; ///
+; /// check installer version
+; ------------------------------------------------------------------------------
+
+(if (< (/ @installer-version 65536) 43)
+
+    (abort (#string_installer (/ @installer-version 65536) (bitand @installer-version 65535)))
+)
+
+; ///
+; /// check os version
+; ------------------------------------------------------------------------------
+
+; get "os version" (exec version)
+
+(set #version (/ (getversion) 65536))
+
+(if (< #version 36)
+
+    (set #os @os_1)
+
+    (if (< #version 39)
+
+        (set #os @os_2)
+
+        (if (< #version 50)
+
+            (set #os @os_3)
+
+            (if (exists "mossys:" (noreq))
+
+                (set #os @os_mos)
+                (set #os @os_4  )
+            )
+        )
+    )
+)
+
+; do we have a supported os?
+
+(if (= (bitand @require_os #os) 0)
+
+    (abort (#string_os @name))
+)
+
+; ///
+; /// check cpu
+; ------------------------------------------------------------------------------
+
+; check 68k cpu (or emulation)
+
+(set #cpu (database "cpu"))
+
+(if (= #cpu "68010")
+
+    (set #cpu @cpu_68010)
+
+    (if (= #cpu "68020")
+
+        (set #cpu @cpu_68020)
+
+        (if (= #cpu "68030")
+
+            (set #cpu @cpu_68030)
+
+            (if (= #cpu "68040")
+
+                (set #cpu @cpu_68040)
+
+                (if (= #cpu "68060")
+
+                    (set #cpu @cpu_68060)
+
+                    (set #cpu @cpu_68000)
+                )
+            )
+        )
+    )
+)
+
+; check ppc cpu
+
+(if (or (= #os @os_4) (= #os @os_mos))
+
+    (set #cpu (bitor #cpu @cpu_ppc))
+
+    ; ELSE
+
+    (if (or (<> (getversion "ppc.library" (resident)) 0) (<> (getversion "powerpc.library" (resident)) 0))
+
+        (set #cpu (bitor #cpu @cpu_ppc))
+    )
+)
+
+; do we have a supported cpu?
+
+(if (= (bitand @require_cpu #cpu) 0)
+
+    (abort (#string_cpu @name))
+)
+
+; ///
+; /// find user data
+; ------------------------------------------------------------------------------
+
+; ///
+; /// welcome
+; ------------------------------------------------------------------------------
+
+; check installer version
+
+(if (< (/ @installer-version 65536) 43)
+
+    (abort (#string_installer (/ @installer-version 65536) (bitand @installer-version 65535)))
+)
+
+; welcome
+
+(if (or (= #installed "") (= @uninstallable 0))
+
+    (
+        (message (#string_welcome @short @name))
+
+        (set #install @install)
+    )
+
+    ; ELSE
+
+    (set #install
+
+        (askbool
+
+            (prompt (#string_welcome @short @name))
+
+            (help @askbool-help)
+
+            (choices
+
+                #string_welcome_install
+                #string_welcome_uninstall
+            )
+
+            (default @install)
+        )
+    )
+)
+
+; ///
+; /// confirm license
+; ------------------------------------------------------------------------------
+
+(if (= #install @install)
+
+    (
+        (until (= #accept @license_accept)
+
+            (set #accept
+
+                (askoptions
+
+                    (prompt #string_license)
+
+                    (help @askoptions-help)
+
+                    (choices
+
+                        (cat #string_esc #string_license_accept)
+                    )
+
+                    (default @license_decline)
+                )
+            )
+        )
+    )
+)
+
+; ///
+; /// installer welcome 
+; ------------------------------------------------------------------------------
+
+(if (= #install @install)
+
+    (welcome)
+)
+
+; ///
+; /// query components
+; ------------------------------------------------------------------------------
+
+(set #components
+
+    (askoptions
+
+        (prompt
+
+            (if (= #upgrading @false)
+
+                (#string_components_install 1 1)
+                (#string_components_update  1 1)
+            )
+        )
+
+        (help #string_components_help)
+
+        (choices
+
+            (cat #string_esc #string_components_software     )
+            (cat #string_esc #string_components_manuals      )
+        )
+
+        (default
+
+            (bitand (select #variant @components_min @components_typical @components_max @components_custom) 255)
+        )
+    )
+)
+
+; ///
+; /// save env
+; ------------------------------------------------------------------------------
+
+; save env variables?
+
+(if (or @envpath @envname @envserial)
+
+    (
+        ; make folders
+
+        (set #prefs1 (tackon "env:"    @envs))
+        (set #prefs2 (tackon "envarc:" @envs))
+
+        (if (not (exists #prefs1))
+
+            (makedir #prefs1)
+        )
+
+        (if (not (exists #prefs2))
+
+            (makedir #prefs2)
+        )
+
+        ; set env variables
+
+        ; copy from env: to envarc:
+
+        (copyfiles
+
+            (source #prefs1)
+            (dest   #prefs2)
+            (all)
+            (optional "nofail" "force" "askuser")
+            (nogauge)
+        )
+    )
+)
+
+; ///
+; /// install components
+; ------------------------------------------------------------------------------
+
+; software
+
+(if (bitand #variant (bitor @variant_max))
+
+    (
+        (copyfiles
+
+            (source "X1kTemp.docky")
+            (dest #target)
+            (nogauge)
+            (optional "nofail" "force" "askuser")
+        )
+    )
+)
+
+; manuals
+
+(if (bitand #variant (bitor @variant_max))
+
+    (
+        (copyfiles
+
+            (source "ReadMe.guide")
+            (dest #target)
+            (nogauge)
+            (optional "nofail" "force" "askuser")
+        )
+    )
+)
+
+; ///
+; /// report
+; ------------------------------------------------------------------------------
+
+(set @default-dest #target)
+
+(if (<> @createdir "")
+
+    (message (#string_success_verbose #target))
+    (message  #string_success)
+)
+
+(exit (quiet))
+
+; ///
