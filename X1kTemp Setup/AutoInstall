@@ -7,7 +7,7 @@ Set X1kTemp.docky `GetEnv AppPaths/X1kTemp.docky`
 Copy X1kTemp/~(X1kTemp.docky) "$X1kTemp.docky" ALL CLONE QUIET
 
 ; copy and store a backup of the executable for Rollback
-CopyStore X1kTemp/X1kTemp.docky "$CompareDirs"
+CopyStore X1kTemp/X1kTemp.docky "$X1kTemp.docky"
 
 ; finally, free the variable
-UnSet CompareDirs
+UnSet X1kTemp.docky
