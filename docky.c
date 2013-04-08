@@ -63,7 +63,7 @@ static void SetAmiUpdateENVVariable(struct DockyBase *db, CONST_STRPTR varname, 
 {
     /* AmiUpdate support code */
     APTR oldwin = NULL;
-    TEXT varpath[1024];// = "AppPaths";
+    TEXT varpath[1024];
     varpath[0] = '\0';
 
     /* stop any "Insert volume..." type requesters */
@@ -391,39 +391,41 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 		uint16 shadowpen = (dd->shadowpen != (uint16)~0) ? dd->shadowpen : BLOCKPEN;
 		uint16 textpen = (dd->textpen != (uint16)~0) ? dd->textpen : TEXTPEN;
         uint32 graphpen = (dd->graphpen != (uint16)~0) ? dd->graphpen : 3;
-        uint32 graphcolor = (dd->graphcolor != (uint16)~0) ? dd->graphcolor : 0x00DD00;
 
         uint8 nIdx = 0, nCorIdx = 0;
         uint16 nTemp = 0;
         struct IBox iBoxCPU = {0, dd->CPUPos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+3},
-         iBoxMB = {0, dd->MBPos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2},
-         iBoxCore1 = {0, dd->Core1Pos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+3},
-         iBoxCore2 = {0, dd->Core2Pos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2};
+                    iBoxMB = {0, dd->MBPos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2},
+                    iBoxCore1 = {0, dd->Core1Pos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+3},
+                    iBoxCore2 = {0, dd->Core2Pos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2};
 		uint16 nDivider = dd->bUseFahrenheit?212:100;
 
         IGraphics->SetABPenDrMd(dd->rp, graphpen, 0, JAM1);
         for(nIdx = 0; nIdx < dd->maxIdx; nIdx++)
         {
             nCorIdx = (dd->curIdx+nIdx)%(dd->maxIdx);
+
             nTemp = dd->MBTemp[nCorIdx] * dd->font->tf_YSize / nDivider;
-
-
             if(0 != nTemp)
-    		   IIntuition->DrawGradient(dd->rp, nIdx, dd->MBPos.y-nTemp, 1, nTemp+3, &iBoxMB, 0L, &dd->GradSpecGraph, dd->dri);
+    		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->MBPos.y-nTemp,
+                                        1, nTemp+3, &iBoxMB, 0L, &dd->GradSpecGraph, dd->dri);
             /*IGraphics->WritePixel(dd->rp, nIdx, dd->MBPos.y-nTemp);//, graphcolor);
             IGraphics->WritePixel(dd->rp, nIdx, dd->MBPos.y);*/
 
             nTemp = dd->CPUTemp[nCorIdx] * dd->font->tf_YSize / nDivider;
             if(0 != nTemp)
-    		   IIntuition->DrawGradient(dd->rp, nIdx, dd->CPUPos.y-nTemp, 1, nTemp+3, &iBoxCPU, 0L, &dd->GradSpecGraph, dd->dri);
+    		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->CPUPos.y-nTemp,
+                                        1, nTemp+3, &iBoxCPU, 0L, &dd->GradSpecGraph, dd->dri);
             //IGraphics->WritePixel(dd->rp, nIdx, dd->CPUPos.y-nTemp);//, graphcolor);
             nTemp = dd->Core1Temp[nCorIdx] * dd->font->tf_YSize / nDivider;
             if(0 != nTemp)
-    		   IIntuition->DrawGradient(dd->rp, nIdx, dd->Core1Pos.y-nTemp, 1, nTemp+3, &iBoxCore1, 0L, &dd->GradSpecGraph, dd->dri);
+    		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->Core1Pos.y-nTemp,
+                                        1, nTemp+3, &iBoxCore1, 0L, &dd->GradSpecGraph, dd->dri);
             //IGraphics->WritePixel(dd->rp, nIdx, dd->Core1Pos.y-nTemp);//, graphcolor);
             nTemp = dd->Core2Temp[nCorIdx] * dd->font->tf_YSize / nDivider;
             if(0 != nTemp)
-    		   IIntuition->DrawGradient(dd->rp, nIdx, dd->Core2Pos.y-nTemp, 1, nTemp+3, &iBoxCore2, 0L, &dd->GradSpecGraph, dd->dri);
+    		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->Core2Pos.y-nTemp,
+                                        1, nTemp+3, &iBoxCore2, 0L, &dd->GradSpecGraph, dd->dri);
             //IGraphics->WritePixel(dd->rp, nIdx, dd->Core2Pos.y-nTemp);//, graphcolor);
         }
 
