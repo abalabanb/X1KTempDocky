@@ -24,7 +24,7 @@ TARGET = X1kTemp.docky
 LIBS =
 
 # Version of the library to build
-VERSION = 1
+VERSION = 53
 
 # Source code files used in this project
 # Add any additional files to this line
@@ -55,8 +55,8 @@ install: $(TARGET)
 revision:
 	bumprev $(VERSION) $(TARGET)
 
-init.c: dockybase.h
-docky.c: dockybase.h
-init.c: dockybase.h
-readtemp.c: dockybase.h
+init.o: dockybase.h X1kTemp.docky_rev.h
+docky.o: dockybase.h X1kTemp.docky_rev.h
+init.o: dockybase.h X1kTemp.docky_rev.h
+readtemp.o: dockybase.h X1kTemp.docky_rev.h
 
