@@ -577,7 +577,8 @@
     (
         (copyfiles
 
-            (source "X1kTemp.docky")
+            (source "CURRDIR:")
+            (pattern "X1kTemp.docky#?")
             (dest #target)
             (nogauge)
             (optional "nofail" "force" "askuser")
@@ -592,7 +593,8 @@
     (
         (copyfiles
 
-            (source "ReadMe.guide")
+            (source "CURRDIR:")
+            (pattern "ReadMe.guide#?")
             (dest #target)
             (nogauge)
             (optional "nofail" "force" "askuser")
