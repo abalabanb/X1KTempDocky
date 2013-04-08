@@ -147,9 +147,7 @@ int smbus_waitready(struct DockyData *dd, smbus_channel_t *chan)
 		uint64 cur = eclto64(ecv);
 		if (cur > end)
 		{
-#ifndef NDEBUG
 			IExec->DebugPrintF("[smbus_waitready] smbus stuck\n");
-#endif
 			__write_chan(chan, smbus_smsta, status);
 			return -1;
 		}
@@ -157,10 +155,8 @@ int smbus_waitready(struct DockyData *dd, smbus_channel_t *chan)
 	
 	if (status & (smbus_smsta_mto | smbus_smsta_mta | smbus_smsta_mtn))
 	{
-#ifndef NDEBUG
 		if (status & (smbus_smsta_mto | smbus_smsta_mta))
 			IExec->DebugPrintF("[smbus_waitready] unexpected SMBUS status: 0x%08x\n", status);
-#endif
 		__write_chan(chan, smbus_ctl, 
 				smbus_ctl_clk(smbus_def_clk) | smbus_ctl_mrr | smbus_ctl_mtr);
 		
@@ -247,12 +243,12 @@ BOOL smbus_startup(struct DockyBase *db)
 		
 		if (db->channels[idx].pci)
 		{
-#ifndef NDEBUG
 			struct PCIResourceRange *range = db->channels[idx].pci->GetResourceRange(0);
+#ifndef NDEBUG
 			IExec->DebugPrintF("SMBus %d has I/O range %p\n", idx, range->BaseAddress);
+#endif
 			db->channels[idx].base = range->BaseAddress | 0xfc800000;
 			db->channels[idx].pci->FreeResourceRange(range);
-#endif
 			db->channels[idx].pci->SetEndian(PCI_MODE_LITTLE_ENDIAN);
 			smbus_init(&db->channels[idx]);
 			idx++;
@@ -282,10 +278,8 @@ BOOL smbus_startup(struct DockyBase *db)
 
 	}
 
-#ifndef NDEBUG
     if(!bStarted)
-    	IExec->DebugPrintF("smbus NOT started\n");
-#endif
+    	IExec->DebugPrintF("[X1kTempDocky] smbus NOT started\n");
 
     return bStarted;
 }
@@ -344,8 +338,11 @@ int tmp423_read_reg(struct DockyData *dd, smbus_channel_t *chan, uint8 slave, ui
 	buf[0] = reg;
 	int err= smbus_write(dd, chan, slave, buf, 1);
 	if (err < 0)
+    {
+		IExec->DebugPrintF("[tmp423_read_reg] can't write on chan\n");
 		return err;
-	
+	}
+
 	/* Read register */
 	return smbus_read(dd, chan, slave, bptr, 1);
 }
@@ -385,9 +382,7 @@ int tmp423_temp_offset64(struct DockyData *dd, tmp423_device_t *dev)
 	}
 	else
 	{
-#ifndef NDEBUG
 		IExec->DebugPrintF("[tmp423_temp_offset64] faild ot read cfg1\n");
-#endif
 		rc = -1;
 	}
 	
@@ -403,18 +398,14 @@ int tmp423_read_temp(struct DockyData *dd, tmp423_device_t *dev, uint8 high, uin
 	int rc = tmp423_read_reg(dd, dev->chan, dev->smbus_addr, high, (uint8 *)&h);
 	if (rc < 0)
     {
-    #ifndef NDEBUG
     	IExec->DebugPrintF("[read_temp] can't read_reg rc=%ld\n", rc);
-    #endif
 		return rc;
 	}
 
 	rc = tmp423_read_reg(dd, dev->chan, dev->smbus_addr, low, (uint8 *)&l);
 	if (rc < 0)
     {
-    #ifndef NDEBUG
     	IExec->DebugPrintF("[read_temp] can't read_reg rc=%ld\n", rc);
-    #endif
 		return rc;
 	}
 	
@@ -452,10 +443,8 @@ int tmp423_read_all_temps(struct DockyData *dd)
 	if(!rc)
     	rc = tmp423_read_temp(dd, &dd->dev, tmp423_rtemp3_h, tmp423_rtemp3_l, &dd->Core2Temp[dd->curIdx]);
 
-#ifndef NDEBUG
     if(rc)
     	IExec->DebugPrintF("[read_all_temps] returns %ld\n", rc);
-#endif
 
     if(!rc) dd->curIdx = (dd->curIdx+1)%dd->maxIdx;
 
