@@ -50,7 +50,6 @@
 #include <proto/diskfont.h>
 #include <proto/expansion.h>
 #include <proto/timer.h>
-#include <proto/Picasso96API.h>
 #include <interfaces/docky.h>
 
 struct DockyBase;
@@ -113,14 +112,12 @@ struct DockyBase {
 	struct ExecIFace *IExec;
 	struct IntuitionIFace *IIntuition;
 	struct GraphicsIFace *IGraphics;
-    struct P96IFace *IP96;
 	struct DiskfontIFace *IDiskfont;
     struct PCIIFace *IPCI;
     struct TimerIFace *ITimer;
 
 	struct Library *IntuitionLib;
 	struct GfxBase *GfxLib;
-    struct Library *P96Lib;
 	struct Library *DiskfontLib;
     struct Library *ExpansionLib;
 

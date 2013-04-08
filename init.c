@@ -180,11 +180,6 @@ int openLibs (struct DockyBase *db) {
 	IGraphics = (struct GraphicsIFace *)IExec->GetInterface((struct Library *)GfxLib, "main",
 		1, NULL);
 	if (!IGraphics) return FALSE;
-	P96Lib = IExec->OpenLibrary("Picasso96API.library", 53);
-	if (!P96Lib) return FALSE;
-	IP96 = (struct P96IFace *)IExec->GetInterface((struct Library *)P96Lib, "main",
-		1, NULL);
-	if (!IP96) return FALSE;
 	DiskfontLib = IExec->OpenLibrary("diskfont.library", 52);
 	if (!DiskfontLib) return FALSE;
 	IDiskfont = (struct DiskfontIFace *)IExec->GetInterface(DiskfontLib, "main", 1, NULL);
@@ -197,8 +192,6 @@ void closeLibs (struct DockyBase *db) {
 	IExec->CloseLibrary(DiskfontLib);
 	IExec->DropInterface((struct Interface *)IGraphics);
 	IExec->CloseLibrary((struct Library *)GfxLib);
-	IExec->DropInterface((struct Interface *)IP96);
-	IExec->CloseLibrary(P96Lib);
 	IExec->DropInterface((struct Interface *)IIntuition);
 	IExec->CloseLibrary(IntuitionLib);
 	IExec->DropInterface((struct Interface *)IIcon);
