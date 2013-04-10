@@ -93,6 +93,9 @@ struct DockyData {
     // display does not allow full record.
     uint8 curIdx, maxIdx;
 
+    // Warn temperatures for each sensor
+    uint16 MBWarnTemp, CPUWarnTemp, Core1WarnTemp, Core2WarnTemp;
+
     uint32 refreshRate;
 
     BOOL bSetEnv;
@@ -128,7 +131,7 @@ struct DockyBase {
     // SMBus interface
     smbus_channel_t channels[SMBUS_MAXCHANNELS];
     uint32 smbus_numchannels;
-    ///
+    // /
 };
 
 #define IExec db->IExec

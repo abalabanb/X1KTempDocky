@@ -43,6 +43,7 @@
 extern const struct TagItem dockyTags[];
 
 static void DockyRender (struct DockyBase *db, struct DockyData *dd);
+static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue);
 
 uint32 strlen(CONST_STRPTR str)
 {
@@ -134,6 +135,8 @@ struct DockyIFace *DockyClone (struct DockyIFace *Self) {
         dd->curIdx = 0;
         dd->maxIdx = min(MAX_RECORD_LENGTH, dd->size.width);
         dd->refreshRate = 50;
+
+        dd->MBWarnTemp = dd->CPUWarnTemp = dd-> Core1WarnTemp = dd->Core2WarnTemp = ~0;
 	}
 	return docky;
 }
@@ -146,6 +149,10 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
 	dd->shadowcolor = dd->textcolor = ~0;
     dd->graphcolor = 0xFF0000;
     dd->graphcolor2 = 0x006400;
+
+    dd->MBWarnTemp = dd->CPUWarnTemp = dd-> Core1WarnTemp = dd->Core2WarnTemp = ~0;
+
+	dd->font = GfxLib->DefaultFont;
 
     dd->bSetEnv = FALSE;
 
@@ -175,6 +182,10 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
         dd->refreshRate = CFGInteger(icon, "REFRESH", 50);
         dd->bSetEnv = CFGBoolean(icon, "SETENV");
         dd->bUseFahrenheit = CFGBoolean(icon, "FAHRENHEIT");
+        dd->MBWarnTemp = CFGInteger(icon, "LOCAL_WARN", ~0);
+        dd->CPUWarnTemp = CFGInteger(icon, "CPU_WARN", ~0);
+        dd->Core1WarnTemp = CFGInteger(icon, "CORE1_WARN", ~0);
+        dd->Core2WarnTemp = CFGInteger(icon, "CORE2_WARN", ~0);
 
 		IIcon->FreeDiskObject(icon);
 	}
@@ -366,11 +377,20 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
         return FALSE;
     }
 
+    uint8 nCorIdx = dd->curIdx?dd->curIdx-1:dd->maxIdx-1;
+
+    // check warning temperatures
+    CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx]);
+    CheckWarnTemperatures(dd, dd->CPUWarnTemp, dd->CPUTemp[nCorIdx]);
+    CheckWarnTemperatures(dd, dd->Core1WarnTemp, dd->Core1Temp[nCorIdx]);
+    CheckWarnTemperatures(dd, dd->Core2WarnTemp, dd->Core2Temp[nCorIdx]);
+
+    // handling environnement variables
     if(dd->bSetEnv)
     {
         TEXT szValue[6];
-        uint8 nCorIdx = dd->curIdx?dd->curIdx-1:dd->maxIdx-1;
         TEXT cUnit = dd->bUseFahrenheit?'F':'C';
+
         IUtility->SNPrintf( szValue, sizeof(szValue)/sizeof(TEXT), "%ld°%lc", dd->MBTemp[nCorIdx], cUnit);
         IDOS->SetVar( "LocalTemp", szValue, -1, GVF_GLOBAL_ONLY );
         IUtility->SNPrintf( szValue, sizeof(szValue)/sizeof(TEXT), "%ld°%lc", dd->CPUTemp[nCorIdx], cUnit);
@@ -464,5 +484,18 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
 	}
+}
+
+static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue)
+{
+    if(((uint16)~0 != nTempThreshold) && (nTempValue >= nTempThreshold))
+    {
+        IDOS->TimedDosRequesterTags(TDR_TitleString, "X1KTemp Docky - Temperature Warning",
+                                    TDR_FormatString, "Local temperature passed above %ld!",
+                                    TDR_GadgetString, "OK",
+                                    TDR_Arg1, nTempThreshold,
+                                    TDR_ImageType, TDRIMAGE_WARNING,
+                                    TAG_END);
+    }
 }
 

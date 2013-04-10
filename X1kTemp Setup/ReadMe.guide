@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.3 (09.04.13)
+@$VER: ReadMe Guide 53.4 (09.04.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-    @{fg shine}X1kTemp Docky v53.3@{fg text}
+    @{fg shine}X1kTemp Docky v53.4@{fg text}
 ---------------------------
 @{i}A temperature monitor docky
 for the AmigaOne X1000.@{ui}
@@ -146,6 +146,7 @@ Future development of this docky involves:
                     - (FIX) Removed reference to ComparDirs from AutoInstall
                     - (FIX) Historic gradients left edges are too far on the
                             left (TommySammy)
+- 53.4, 11/04/2013: - (ADD) Install script can now add the docky into AmiDock
 
 @endnode
 @node CONTACT "Contact Me"
