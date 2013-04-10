@@ -100,6 +100,14 @@ tooltypes are available:
   By default environnement variables are not set.
 - FAHRENHEIT (YES|NO): activate or not the conversion to the Fahrenheit
   scale. By default temperatures are displayed using the Celsius scale.
+- LOCAL_WARN (INTEGER): temperature threshold for the local sensor above
+  which a warning should be emitted.
+- CPU_WARN (INTEGER): temperature threshold for the CPU sensor above
+  which a warning should be emitted.
+- CORE1_WARN (INTEGER): temperature threshold for the first core sensor
+  above which a warning should be emitted.
+- CORE2_WARN (INTEGER): temperature threshold for the second sensor
+  above which a warning should be emitted.
 
 Note that after each tooltype the datatype or allowed values are listed
 between parenthesis.
@@ -147,6 +155,8 @@ Future development of this docky involves:
                     - (FIX) Historic gradients left edges are too far on the
                             left (TommySammy)
 - 53.4, 11/04/2013: - (ADD) Install script can now add the docky into AmiDock
+                    - (ADD) The docky can now warn the user when temperature
+                            is reach for any of the sensor (LyleHaze)
 
 @endnode
 @node CONTACT "Contact Me"
