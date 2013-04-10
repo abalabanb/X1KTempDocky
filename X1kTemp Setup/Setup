@@ -74,6 +74,8 @@
         (set #string_components_manuals       "Manuals")
 
         (set #string_startup                  "Make required changes to the s:user-startup file of your computer?")
+
+        (set #string_add_docky                "The installer can automatically add the docky into AmiDock.\nHowever it can only install it into the main dock.\n\nDo you want to add the docky into AmiDock?")
     )
 )
 
@@ -577,8 +579,8 @@
     (
         (copyfiles
 
-            (source "CURRDIR:")
-            (pattern "X1kTemp.docky#?")
+            (source "X1kTemp.docky")
+            (infos)
             (dest #target)
             (nogauge)
             (optional "nofail" "force" "askuser")
@@ -593,13 +595,23 @@
     (
         (copyfiles
 
-            (source "CURRDIR:")
-            (pattern "ReadMe.guide#?")
+            (source "ReadMe.guide")
+            (infos)
             (dest #target)
             (nogauge)
             (optional "nofail" "force" "askuser")
         )
     )
+)
+
+; ///
+; /// execute arexx
+; ------------------------------------------------------------------------------
+
+(rexx "CURRDIR:add_docky.rexx"
+    (prompt #string_add_docky)
+    (help)
+    (confirm "average")
 )
 
 ; ///
