@@ -49,6 +49,7 @@
 #include <proto/graphics.h>
 #include <proto/diskfont.h>
 #include <proto/expansion.h>
+#include <proto/application.h>
 #include <proto/timer.h>
 #include <interfaces/docky.h>
 
@@ -95,6 +96,7 @@ struct DockyData {
 
     // Warn temperatures for each sensor
     uint16 MBWarnTemp, CPUWarnTemp, Core1WarnTemp, Core2WarnTemp;
+    TEXT szWarnCmd[2048];
 
     uint32 refreshRate;
 
@@ -102,6 +104,11 @@ struct DockyData {
     BOOL bUseFahrenheit;
 
     tmp423_device_t dev;
+
+    // Application.library part
+    uint32 nAppID;
+    struct MsgPort *pAppLibPort;
+    BOOL bAlreadyNotified;
 };
 
 #define DDF_BLINK 1
@@ -118,11 +125,13 @@ struct DockyBase {
 	struct DiskfontIFace *IDiskfont;
     struct PCIIFace *IPCI;
     struct TimerIFace *ITimer;
+    struct ApplicationIFace *IApplication;
 
 	struct Library *IntuitionLib;
 	struct GfxBase *GfxLib;
 	struct Library *DiskfontLib;
     struct Library *ExpansionLib;
+    struct Library *ApplicationLib;
 
     struct MsgPort *TimerPort;
     struct TimeRequest *TimerRequest;
@@ -140,14 +149,14 @@ struct DockyBase {
 #define IDiskfont db->IDiskfont
 #define ITimer db->ITimer
 #define IPCI db->IPCI
-#define IP96 db->IP96
+#define IApplication db->IApplication
 
 #define ExecLib db->ExecLib
 #define IntuitionLib db->IntuitionLib
 #define GfxLib db->GfxLib
 #define DiskfontLib db->DiskfontLib
 #define ExpansionLib db->ExpansionLib
-#define P96Lib db->P96Lib
+#define ApplicationLib db->ApplicationLib
 
 uint32 DockyObtain (struct DockyIFace *Self);
 uint32 DockyRelease (struct DockyIFace *Self);

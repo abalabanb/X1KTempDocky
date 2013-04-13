@@ -184,6 +184,10 @@ int openLibs (struct DockyBase *db) {
 	if (!DiskfontLib) return FALSE;
 	IDiskfont = (struct DiskfontIFace *)IExec->GetInterface(DiskfontLib, "main", 1, NULL);
 	if (!IDiskfont) return FALSE;
+	ApplicationLib = IExec->OpenLibrary("application.library", 53);
+	if (!ApplicationLib) return FALSE;
+	IApplication = (struct ApplicationIFace *)IExec->GetInterface(ApplicationLib, "application", 1, NULL);
+	if (!IApplication) return FALSE;
 	return TRUE;
 }
 
@@ -200,6 +204,8 @@ void closeLibs (struct DockyBase *db) {
 	IExec->CloseLibrary(UtilityLib);
 	IExec->DropInterface((struct Interface *)IDOS);
 	IExec->CloseLibrary(DOSLib);
+	IExec->DropInterface((struct Interface *)IApplication);
+	IExec->CloseLibrary(ApplicationLib);
 }
 
 /* ------------------- Manager Interface ------------------------ */

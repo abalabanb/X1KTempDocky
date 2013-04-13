@@ -43,7 +43,7 @@
 extern const struct TagItem dockyTags[];
 
 static void DockyRender (struct DockyBase *db, struct DockyData *dd);
-static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue);
+static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, CONST_STRPTR szSensor);
 
 uint32 strlen(CONST_STRPTR str)
 {
@@ -88,12 +88,29 @@ static void SetAmiUpdateENVVariable(struct DockyBase *db, CONST_STRPTR varname, 
     IDOS->SetProcWindow( oldwin );
 }
 
-
+/// DockyObtain
 uint32 DockyObtain (struct DockyIFace *Self) {
-	return ++Self->Data.RefCount;
-}
+	struct DockyBase *db = (struct DockyBase *)Self->Data.LibBase;
+	struct DockyData *dd = (struct DockyData *)((uint8 *)Self - Self->Data.NegativeSize);
 
+    dd->nAppID = IApplication->RegisterApplication("X1kTemp",
+            REGAPP_URLIdentifier, "balaban.fr",
+            REGAPP_Description, "Temperature monitor docky",
+            TAG_DONE);
+    IExec->DebugPrintF("[RegisterApplication] AppId=%ld\n", dd->nAppID);
+
+    return ++Self->Data.RefCount;
+}
+///
+/// DockyRelease
 uint32 DockyRelease (struct DockyIFace *Self) {
+	struct DockyBase *db = (struct DockyBase *)Self->Data.LibBase;
+	struct DockyData *dd = (struct DockyData *)((uint8 *)Self - Self->Data.NegativeSize);
+
+    IExec->DebugPrintF("[UnregisterApplication] before unreg %ld %08x\n", dd->nAppID, IApplication);
+    IApplication->UnregisterApplicationA(dd->nAppID, NULL);
+    IExec->DebugPrintF("[UnregisterApplication] after\n");
+
 	Self->Data.RefCount--;
 	if (!Self->Data.RefCount && (Self->Data.Flags & IFLF_CLONED)) {
 		struct DockyBase *db = (struct DockyBase *)Self->Data.LibBase;
@@ -101,7 +118,8 @@ uint32 DockyRelease (struct DockyIFace *Self) {
 	}
 	return Self->Data.RefCount;
 }
-
+///
+/// DockyClone
 struct DockyIFace *DockyClone (struct DockyIFace *Self) {
 	struct DockyBase *db = (struct DockyBase *)Self->Data.LibBase;
 	struct DockyIFace *docky = NULL;
@@ -140,7 +158,9 @@ struct DockyIFace *DockyClone (struct DockyIFace *Self) {
 	}
 	return docky;
 }
+///
 
+/// ReadDockyPrefs
 static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *filename) {
 	struct DiskObject *icon;
 
@@ -155,6 +175,9 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
 	dd->font = GfxLib->DefaultFont;
 
     dd->bSetEnv = FALSE;
+    dd->szWarnCmd[0] = '\0' ;
+    IApplication->GetApplicationAttrs(dd->nAppID, APPATTR_Port, &dd->pAppLibPort, TAG_DONE);
+    dd->bAlreadyNotified = FALSE;
 
 	icon = IIcon->GetDiskObjectNew(filename);
 	if (icon) {
@@ -186,6 +209,9 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
         dd->CPUWarnTemp = CFGInteger(icon, "CPU_WARN", ~0);
         dd->Core1WarnTemp = CFGInteger(icon, "CORE1_WARN", ~0);
         dd->Core2WarnTemp = CFGInteger(icon, "CORE2_WARN", ~0);
+        STRPTR szTmp = CFGString(icon, "WARN_CMD", NULL);
+        if(szTmp)
+            IUtility->Strlcpy(dd->szWarnCmd, szTmp, 2048);
 
 		IIcon->FreeDiskObject(icon);
 	}
@@ -213,7 +239,8 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
 	dd->GradSpecGraph.Specs.Abs.RGBStart[1] = GREEN(dd->graphcolor2);
 	dd->GradSpecGraph.Specs.Abs.RGBStart[2] = BLUE(dd->graphcolor2);
 }
-
+///
+/// ReleaseDockyPens
 static void ReleaseDockyPens (struct DockyBase *db, struct DockyData *dd) {
 	if (dd->scr) {
 		struct ColorMap *cm = dd->scr->ViewPort.ColorMap;
@@ -228,7 +255,8 @@ static void ReleaseDockyPens (struct DockyBase *db, struct DockyData *dd) {
 		dd->graphpen = ~0;
 	}
 }
-
+///
+/// Obtain DockyPens
 static void ObtainDockyPens (struct DockyBase *db, struct DockyData *dd, struct Screen *scr) {
 	ReleaseDockyPens(db, dd);
 	if (dd->scr = scr) {
@@ -251,7 +279,8 @@ static void ObtainDockyPens (struct DockyBase *db, struct DockyData *dd, struct 
         dd->dri = IIntuition->GetScreenDrawInfo(scr);
 	}
 }
-
+///
+/// DockyExpunge
 void DockyExpunge (struct DockyIFace *Self) {
 	if (!Self->Data.RefCount) {
 		struct DockyBase *db = (struct DockyBase *)Self->Data.LibBase;
@@ -265,7 +294,8 @@ void DockyExpunge (struct DockyIFace *Self) {
 		IExec->FreeVec((uint8 *)Self - Self->Data.NegativeSize);
 	}
 }
-
+///
+/// DockyGet
 BOOL DockyGet (struct DockyIFace *Self, uint32 msgType, uint32 *msgData) {
 	struct DockyData *dd = (struct DockyData *)((uint8 *)Self - Self->Data.NegativeSize);
 	BOOL res = TRUE;
@@ -300,7 +330,8 @@ BOOL DockyGet (struct DockyIFace *Self, uint32 msgType, uint32 *msgData) {
 
 	return res;
 }
-
+///
+/// DockySet
 BOOL DockySet (struct DockyIFace *Self, uint32 msgType, uint32 msgData) {
 	struct DockyData *dd = (struct DockyData *)((uint8 *)Self - Self->Data.NegativeSize);
 	BOOL res = TRUE;
@@ -362,7 +393,9 @@ BOOL DockySet (struct DockyIFace *Self, uint32 msgType, uint32 msgData) {
 
 	return res;
 }
+///
 
+/// DockProcess
 BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, uint32 *msgData,
 	BOOL *anotherTurn)
 {
@@ -380,10 +413,10 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
     uint8 nCorIdx = dd->curIdx?dd->curIdx-1:dd->maxIdx-1;
 
     // check warning temperatures
-    CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx]);
-    CheckWarnTemperatures(dd, dd->CPUWarnTemp, dd->CPUTemp[nCorIdx]);
-    CheckWarnTemperatures(dd, dd->Core1WarnTemp, dd->Core1Temp[nCorIdx]);
-    CheckWarnTemperatures(dd, dd->Core2WarnTemp, dd->Core2Temp[nCorIdx]);
+    CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx], "Case");
+    CheckWarnTemperatures(dd, dd->CPUWarnTemp, dd->CPUTemp[nCorIdx], "CPU");
+    CheckWarnTemperatures(dd, dd->Core1WarnTemp, dd->Core1Temp[nCorIdx], "Core1");
+    CheckWarnTemperatures(dd, dd->Core2WarnTemp, dd->Core2Temp[nCorIdx], "Core2");
 
     // handling environnement variables
     if(dd->bSetEnv)
@@ -401,9 +434,24 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
         IDOS->SetVar( "Core2Temp", szValue, -1, GVF_GLOBAL_ONLY );
     }
 
+    if(dd->bAlreadyNotified && dd->pAppLibPort)
+    {
+        struct ApplicationCustomMsg *pAppMsg = (struct ApplicationCustomMsg*)IExec->GetMsg(dd->pAppLibPort);
+        if(pAppMsg)
+        {
+            if(APPLIBMT_CustomMsg == pAppMsg->almsg.type)
+            {
+                dd->bAlreadyNotified = FALSE;
+            }
+            IExec->ReplyMsg((struct Message*)pAppMsg);
+        }
+    }
+
 	return TRUE;
 }
+///
 
+/// DockyRender
 static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 	if (dd->rp) {
         TEXT tmp[MAX_STRING_SIZE+2];
@@ -485,17 +533,43 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
 	}
 }
-
-static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue)
+///
+/// CheckWarnTemperatures
+static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, CONST_STRPTR szSensor)
 {
     if(((uint16)~0 != nTempThreshold) && (nTempValue >= nTempThreshold))
     {
-        IDOS->TimedDosRequesterTags(TDR_TitleString, "X1KTemp Docky - Temperature Warning",
-                                    TDR_FormatString, "Local temperature passed above %ld!",
-                                    TDR_GadgetString, "OK",
-                                    TDR_Arg1, nTempThreshold,
-                                    TDR_ImageType, TDRIMAGE_WARNING,
-                                    TAG_END);
+        struct DockyBase * db = dd->Base;
+#ifndef NDEBUG
+    	IExec->DebugPrintF("[CheckWarnTemperatures] %s temperature exceeds %ld\n", szSensor, nTempThreshold);
+#endif
+
+        if(!dd->bAlreadyNotified)
+        {
+            if(0 != *dd->szWarnCmd)
+            {
+                IDOS->System(dd->szWarnCmd, NULL);
+            }
+            else
+            {
+                TEXT tmp[129];
+                IUtility->SNPrintf(tmp, sizeof(tmp)/sizeof(TEXT),
+                                    "%s temperature passed above %ld°%lc",
+                                    szSensor, nTempThreshold, dd->bUseFahrenheit?'F':'C');
+                uint32 result = IApplication->Notify(dd->nAppID,
+                                    APPNOTIFY_Title,        "X1KTemp Docky - Temperature Warning",
+                                    APPNOTIFY_Update,        FALSE,
+                                    APPNOTIFY_Pri,           0,
+                                    APPNOTIFY_PubScreenName, "FRONT",
+                                    APPNOTIFY_ImageFile,     "tbimages:warning",
+                                    APPNOTIFY_CloseOnDC,     TRUE,
+                                    APPNOTIFY_BackMsg,       "Clicked",
+                                    APPNOTIFY_Text,          tmp,
+                                    TAG_DONE);
+            	IExec->DebugPrintF("[CheckWarnTemperatures] notify returned %ld\n", result);
+            }
+            dd->bAlreadyNotified = TRUE;
+        }
     }
 }
-
+///

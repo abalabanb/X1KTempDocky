@@ -1,6 +1,6 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.4 (09.04.13)
+@$VER: ReadMe Guide 53.4 (13.04.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
@@ -66,6 +66,8 @@ X1kTemp Docky has the following features:
 - configurable font name and size,
 - configurable colors for texts and gradient.
 - support AmiUpdate for future updates.
+- configurable temperature thresholds that trigger either a Ringhio
+  notification or execute a configurable commandline.
 
 @endnode
 @node INSTALLATION "Installation"
@@ -108,6 +110,8 @@ tooltypes are available:
   above which a warning should be emitted.
 - CORE2_WARN (INTEGER): temperature threshold for the second sensor
   above which a warning should be emitted.
+- WARN_CMD (STRING): command to execute when any of the above temperature
+  is reached. By default if a Ringhio notification will be issued.
 
 Note that after each tooltype the datatype or allowed values are listed
 between parenthesis.
@@ -154,7 +158,7 @@ Future development of this docky involves:
                     - (FIX) Removed reference to ComparDirs from AutoInstall
                     - (FIX) Historic gradients left edges are too far on the
                             left (TommySammy)
-- 53.4, 11/04/2013: - (ADD) Install script can now add the docky into AmiDock
+- 53.4, 13/04/2013: - (ADD) Install script can now add the docky into AmiDock
                     - (ADD) The docky can now warn the user when temperature
                             is reach for any of the sensor (LyleHaze)
 
