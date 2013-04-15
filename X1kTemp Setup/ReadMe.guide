@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.4 (13.04.13)
+@$VER: ReadMe Guide 53.5 (15.04.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-    @{fg shine}X1kTemp Docky v53.4@{fg text}
+    @{fg shine}X1kTemp Docky v53.5@{fg text}
 ---------------------------
 @{i}A temperature monitor docky
 for the AmigaOne X1000.@{ui}
@@ -52,6 +52,11 @@ the current values from the temperature sensors.
 A1-X1k has four temperature sensors one for the ambient (aka motherboard),
 one for the SOC (aka CPU) and one for each Core.
 
+The operating temperatures of the components are:
+- PASemi CPU: its operating temprature is up to 85°C.
+- SB600 (no sensor): its operating temperature is 105°C as long as the case
+  temperature is not greater than 45°C.
+
 @endnode
 
 @node FEATURES "Features"
@@ -74,7 +79,7 @@ X1kTemp Docky has the following features:
 @{fg shine}Installation@{fg text}
 ------------
 
-Just use the provided installer.
+Just use the provided @{"installer" system "Setup >con://///AUTO/WAIT/CLOSE"}.
 
 @endnode
 @node CONFIGURATION "Configuration"
@@ -158,9 +163,11 @@ Future development of this docky involves:
                     - (FIX) Removed reference to ComparDirs from AutoInstall
                     - (FIX) Historic gradients left edges are too far on the
                             left (TommySammy)
-- 53.4, 13/04/2013: - (ADD) Install script can now add the docky into AmiDock
+- 53.4, internal  : - (ADD) Install script can now add the docky into AmiDock
                     - (ADD) The docky can now warn the user when temperature
                             is reach for any of the sensor (LyleHaze)
+- 53.5, 15/04/2013: - (FIX) Sensor affectation (CPU is remote3 not remote1)
+                    - (ADD) Operating temperatures indication in the doc
 
 @endnode
 @node CONTACT "Contact Me"

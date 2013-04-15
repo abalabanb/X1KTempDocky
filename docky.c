@@ -499,7 +499,7 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 
         TEXT cUnit = dd->bUseFahrenheit?'F':'C';
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "Local: %3ld°%lc", dd->MBTemp[nCorIdx], cUnit);
+        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "Case:  %3ld°%lc", dd->MBTemp[nCorIdx], cUnit);
 		IGraphics->SetFont(dd->rp, dd->font);
 		IGraphics->Move(dd->rp, dd->MBPos.x+1, dd->MBPos.y+1);
 		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
@@ -508,7 +508,7 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "CPU:   %3ld°%lc", dd->CPUTemp[nCorIdx], cUnit);
+        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "CPU: %3ld°%lc", dd->CPUTemp[nCorIdx], cUnit);
 		IGraphics->Move(dd->rp, dd->CPUPos.x+1, dd->CPUPos.y+1);
 		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));

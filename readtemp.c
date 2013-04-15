@@ -437,11 +437,11 @@ int tmp423_read_all_temps(struct DockyData *dd)
 
     rc = tmp423_read_temp(dd, &dd->dev, tmp423_ltemp_h, tmp423_ltemp_l, &dd->MBTemp[dd->curIdx]);
 	if(!rc)
-        rc = tmp423_read_temp(dd, &dd->dev, tmp423_rtemp1_h, tmp423_rtemp1_l, &dd->CPUTemp[dd->curIdx]);
+        rc = tmp423_read_temp(dd, &dd->dev, tmp423_rtemp1_h, tmp423_rtemp1_l, &dd->Core1Temp[dd->curIdx]);
 	if(!rc)
-    	rc = tmp423_read_temp(dd, &dd->dev, tmp423_rtemp2_h, tmp423_rtemp2_l, &dd->Core1Temp[dd->curIdx]);
+    	rc = tmp423_read_temp(dd, &dd->dev, tmp423_rtemp2_h, tmp423_rtemp2_l, &dd->Core2Temp[dd->curIdx]);
 	if(!rc)
-    	rc = tmp423_read_temp(dd, &dd->dev, tmp423_rtemp3_h, tmp423_rtemp3_l, &dd->Core2Temp[dd->curIdx]);
+    	rc = tmp423_read_temp(dd, &dd->dev, tmp423_rtemp3_h, tmp423_rtemp3_l, &dd->CPUTemp[dd->curIdx]);
 
     if(rc)
     	IExec->DebugPrintF("[read_all_temps] returns %ld\n", rc);
@@ -471,9 +471,9 @@ int tmp423_read_all_temps(struct DockyData *dd)
 	tmp423_read_temp(&dev, tmp423_rtemp3_h, tmp423_rtemp3_l, &rem3);
 
 	printf("Local (Mainboard)	:	%d °C\n",	(uint32)local);
-	printf("Remote1 (CPU)		:	%d °C\n",	(uint32)rem1);
-	printf("Remote2 (Core 0)	:	%d °C\n",	(uint32)rem2);
-	printf("Remote3 (Core 1)	:	%d °C\n",	(uint32)rem3);
+	printf("Remote1 (Core 0)    :	%d °C\n",	(uint32)rem1);
+	printf("Remote2 (Core 1)	:	%d °C\n",	(uint32)rem2);
+	printf("Remote3 (CPU)  	  :	  %d °C\n",	  (uint32)rem3);
 
 	smbus_shutdown();
 	return 0;
