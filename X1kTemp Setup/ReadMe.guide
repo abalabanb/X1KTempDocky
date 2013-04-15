@@ -146,10 +146,10 @@ scale used.
 At the moment no bugs are known.
 
 Future development of this docky involves:
-- configurable threshold which when reached would execute a configurable
-  command line
 - replace tooltype configuration by application.library built-in XML
   configuration feature
+- localize setup script and Ringhio notifications messages
+- add an option to draw a background instead of being transparent
 
 @endnode
 @node HISTORY "History"
@@ -169,6 +169,8 @@ Future development of this docky involves:
 - 53.5, 15/04/2013: - (FIX) Sensor affectation (CPU is remote3 not remote1)
                     - (ADD) Operating temperatures indication in the doc
                     - (FIX) Install script refers to static dev path (zzd10h)
+                    - (ADD) Specific icon for the Ringhio notification by
+                            TommySammy
 
 @endnode
 @node CONTACT "Contact Me"

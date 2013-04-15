@@ -179,6 +179,26 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
     IApplication->GetApplicationAttrs(dd->nAppID, APPATTR_Port, &dd->pAppLibPort, TAG_DONE);
     dd->bAlreadyNotified = FALSE;
 
+    IUtility->Strlcpy(dd->szImageFile, filename, 2048);
+    STRPTR pFilePart = IDOS->FilePart(dd->szImageFile);
+    if(pFilePart) *pFilePart = '\0';
+
+    IUtility->Strlcat(dd->szImageFile, "X1kTempWarn", 2048);
+    BPTR lock = IDOS->Open(dd->szImageFile, MODE_OLDFILE);
+    if(lock)
+    {
+        if(!IDOS->DevNameFromFH(lock, dd->szImageFile, 2048, DN_FULLPATH))
+            dd->szImageFile[0] = '\0';
+    }
+    else
+    {
+        dd->szImageFile[0] = '\0';
+    }
+    if('\0' == dd->szImageFile[0])
+    {
+        IUtility->Strlcpy(dd->szImageFile, "tbimages:warning", 2048);
+    }
+
 	icon = IIcon->GetDiskObjectNew(filename);
 	if (icon) {
 		char *str;
@@ -508,7 +528,7 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "CPU: %3ld°%lc", dd->CPUTemp[nCorIdx], cUnit);
+        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "CPU:   %3ld°%lc", dd->CPUTemp[nCorIdx], cUnit);
 		IGraphics->Move(dd->rp, dd->CPUPos.x+1, dd->CPUPos.y+1);
 		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
@@ -561,7 +581,7 @@ static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, u
                                     APPNOTIFY_Update,        FALSE,
                                     APPNOTIFY_Pri,           0,
                                     APPNOTIFY_PubScreenName, "FRONT",
-                                    APPNOTIFY_ImageFile,     "tbimages:warning",
+                                    APPNOTIFY_ImageFile,     dd->szImageFile,
                                     APPNOTIFY_CloseOnDC,     TRUE,
                                     APPNOTIFY_BackMsg,       "Clicked",
                                     APPNOTIFY_Text,          tmp,

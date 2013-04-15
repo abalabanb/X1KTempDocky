@@ -109,6 +109,7 @@ struct DockyData {
     uint32 nAppID;
     struct MsgPort *pAppLibPort;
     BOOL bAlreadyNotified;
+    TEXT szImageFile[2048];
 };
 
 #define DDF_BLINK 1

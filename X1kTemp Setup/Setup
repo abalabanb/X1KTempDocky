@@ -55,10 +55,10 @@
 
         (set #string_old                      "The installed version is too old to be upgraded. Please uninstall the old version and repeat this installation.")
 
-        (set #string_welcome                  "Welcome to X1kTemp.docky Setup!\n\nThis program installs X1kTemp Docky 53.3 on your computer.")
+        (set #string_welcome                  "Welcome to X1kTemp.docky Setup!\n\nThis program installs X1kTemp Docky 53.5 on your computer.")
         (set #string_welcome_install          "INSTALL")
 
-        (set #string_license                  "LICENSE\nX1kTemp Docky 53.3 ©2013 Alexandre BALABAN, All Rights Reserved.\nTHIS SOFTWARE IS PROTECTED BY INTERNATIONAL AND NATIONAL LAWS. UNAUTHORIZED DISTRIBUTION OR RENTAL OF THIS SOFTWARE OR ONE OF ITS COMPONENTS ARE PROSECUTED TO THE FULLEST EXTENT POSSIBLE. FOR FULL COPYRIGHT INFORMATION, PLEASE READ THE INCLUDED LICENSE DOCUMENT.")
+        (set #string_license                  "LICENSE\nX1kTemp Docky 53.5 ©2013 Alexandre BALABAN, All Rights Reserved.\nTHIS SOFTWARE IS PROTECTED BY INTERNATIONAL AND NATIONAL LAWS. UNAUTHORIZED DISTRIBUTION OR RENTAL OF THIS SOFTWARE OR ONE OF ITS COMPONENTS ARE PROSECUTED TO THE FULLEST EXTENT POSSIBLE. FOR FULL COPYRIGHT INFORMATION, PLEASE READ THE INCLUDED LICENSE DOCUMENT.")
         (set #string_license_accept           "I accept the terms of the license agreement")
 
         (set #studio_installerror             "An error has occured during the installation. The error description can be found in the logfile t:install.logfile (if log file creation has been enabled). The error code is:\n\n%ld\n\nIf the problem persists after repeating the installation, please contact alexandre@balaban.fr.")
@@ -580,6 +580,14 @@
         (copyfiles
 
             (source "X1kTemp.docky")
+            (infos)
+            (dest #target)
+            (nogauge)
+            (optional "nofail" "force" "askuser")
+        )
+        (copyfiles
+
+            (source "X1kTempWarn")
             (infos)
             (dest #target)
             (nogauge)
