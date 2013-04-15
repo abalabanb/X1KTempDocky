@@ -168,6 +168,7 @@ Future development of this docky involves:
                             is reach for any of the sensor (LyleHaze)
 - 53.5, 15/04/2013: - (FIX) Sensor affectation (CPU is remote3 not remote1)
                     - (ADD) Operating temperatures indication in the doc
+                    - (FIX) Install script refers to static dev path (zzd10h)
 
 @endnode
 @node CONTACT "Contact Me"
