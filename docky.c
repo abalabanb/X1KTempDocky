@@ -131,7 +131,7 @@ struct DockyIFace *DockyClone (struct DockyIFace *Self) {
 		IUtility->SetMem(dd, 0, sizeof(struct DockyData));
 
         dd->Base = db;
-		dd->shadowpen = dd->textpen = dd->graphpen = ~0;
+		dd->shadowpen = dd->textpen = dd->backpen = ~0;
 		dd->shadowcolor = dd->textcolor = ~0;
         dd->graphcolor = 0xFF0000;
         dd->graphcolor2 = 0x006400;
@@ -165,8 +165,8 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
 	struct DiskObject *icon;
 
     dd->Base = db;
-	dd->shadowpen = dd->textpen = dd->graphpen = ~0;
-	dd->shadowcolor = dd->textcolor = ~0;
+	dd->shadowpen = dd->textpen = dd->backpen = ~0;
+	dd->shadowcolor = dd->textcolor = dd->backcolor = ~0;
     dd->graphcolor = 0xFF0000;
     dd->graphcolor2 = 0x006400;
 
@@ -220,6 +220,7 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
 		
 		dd->shadowcolor = CFGHex(icon, "SHADOWCOLOR", 0);
 		dd->textcolor = CFGHex(icon, "TEXTCOLOR", ~0);
+		dd->backcolor = CFGHex(icon, "BACKCOLOR", ~0);
 		dd->graphcolor = CFGHex(icon, "GRAPHCOLOR_UP", 0xFF0000);
 		dd->graphcolor2 = CFGHex(icon, "GRAPHCOLOR_DOWN", 0x006400);
         dd->refreshRate = CFGInteger(icon, "REFRESH", 50);
@@ -266,13 +267,13 @@ static void ReleaseDockyPens (struct DockyBase *db, struct DockyData *dd) {
 		struct ColorMap *cm = dd->scr->ViewPort.ColorMap;
 		if (dd->shadowpen != (uint16)~0) IGraphics->ReleasePen(cm, dd->shadowpen);
 		if (dd->textpen != (uint16)~0) IGraphics->ReleasePen(cm, dd->textpen);
-		if (dd->graphpen != (uint16)~0) IGraphics->ReleasePen(cm, dd->graphpen);
+		if (dd->backpen != (uint16)~0) IGraphics->ReleasePen(cm, dd->backpen);
         if (dd->dri) IIntuition->FreeScreenDrawInfo(dd->scr, dd->dri);
 		dd->scr = NULL;
         dd->dri = NULL;
 		dd->shadowpen = ~0;
 		dd->textpen = ~0;
-		dd->graphpen = ~0;
+		dd->backpen = ~0;
 	}
 }
 ///
@@ -291,11 +292,12 @@ static void ObtainDockyPens (struct DockyBase *db, struct DockyData *dd, struct 
 			RGB8to32((dd->textcolor >> 8) & 255),
 			RGB8to32(dd->textcolor & 255),
 			NULL);
-		dd->graphpen = IGraphics->ObtainBestPenA(cm,
-			RGB8to32((dd->graphcolor >> 16) & 255),
-			RGB8to32((dd->graphcolor >> 8) & 255),
-			RGB8to32(dd->graphcolor & 255),
-			NULL);
+        if(~0 != dd->backcolor)
+    		dd->backpen = IGraphics->ObtainBestPenA(cm,
+    			RGB8to32(RED(dd->backcolor)),
+    			RGB8to32(GREEN(dd->backcolor)),
+    			RGB8to32(BLUE(dd->backcolor)),
+    			NULL);
         dd->dri = IIntuition->GetScreenDrawInfo(scr);
 	}
 }
@@ -478,7 +480,6 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 
 		uint16 shadowpen = (dd->shadowpen != (uint16)~0) ? dd->shadowpen : BLOCKPEN;
 		uint16 textpen = (dd->textpen != (uint16)~0) ? dd->textpen : TEXTPEN;
-        uint32 graphpen = (dd->graphpen != (uint16)~0) ? dd->graphpen : 3;
 
         uint8 nIdx = 0, nCorIdx = 0;
         uint16 nTemp = 0;
@@ -488,7 +489,12 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
                     iBoxCore2 = {0, dd->Core2Pos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2};
 		uint16 nDivider = dd->bUseFahrenheit?212:100;
 
-        IGraphics->SetABPenDrMd(dd->rp, graphpen, 0, JAM1);
+        if(dd->backpen != (uint16)~0)
+        {
+            IGraphics->SetAPen(dd->rp, dd->backpen);
+            IGraphics->RectFill(dd->rp, 0, 0, dd->size.width, dd->size.height);
+        }
+
         for(nIdx = 0; nIdx < dd->maxIdx; nIdx++)
         {
             nCorIdx = (dd->curIdx+nIdx)%(dd->maxIdx);
@@ -497,24 +503,19 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
             if(0 != nTemp)
     		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->MBPos.y-nTemp,
                                         1, nTemp+3, &iBoxMB, 0L, &dd->GradSpecGraph, dd->dri);
-            /*IGraphics->WritePixel(dd->rp, nIdx, dd->MBPos.y-nTemp);//, graphcolor);
-            IGraphics->WritePixel(dd->rp, nIdx, dd->MBPos.y);*/
 
             nTemp = dd->CPUTemp[nCorIdx] * dd->font->tf_YSize / nDivider;
             if(0 != nTemp)
     		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->CPUPos.y-nTemp,
                                         1, nTemp+3, &iBoxCPU, 0L, &dd->GradSpecGraph, dd->dri);
-            //IGraphics->WritePixel(dd->rp, nIdx, dd->CPUPos.y-nTemp);//, graphcolor);
             nTemp = dd->Core1Temp[nCorIdx] * dd->font->tf_YSize / nDivider;
             if(0 != nTemp)
     		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->Core1Pos.y-nTemp,
                                         1, nTemp+3, &iBoxCore1, 0L, &dd->GradSpecGraph, dd->dri);
-            //IGraphics->WritePixel(dd->rp, nIdx, dd->Core1Pos.y-nTemp);//, graphcolor);
             nTemp = dd->Core2Temp[nCorIdx] * dd->font->tf_YSize / nDivider;
             if(0 != nTemp)
     		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->Core2Pos.y-nTemp,
                                         1, nTemp+3, &iBoxCore2, 0L, &dd->GradSpecGraph, dd->dri);
-            //IGraphics->WritePixel(dd->rp, nIdx, dd->Core2Pos.y-nTemp);//, graphcolor);
         }
 
         TEXT cUnit = dd->bUseFahrenheit?'F':'C';

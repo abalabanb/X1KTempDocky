@@ -68,11 +68,12 @@ X1kTemp Docky has the following features:
 - displays up to 72 temperature historic values,
 - optional temperature conversion to Fahrenheit scale,
 - optional setting of environnement variables for each sensor's temperature,
+- transparent background or filled background,
 - configurable font name and size,
-- configurable colors for texts and gradient.
-- support AmiUpdate for future updates.
+- configurable colors for texts, gradient and background,
+- support AmiUpdate for future updates,
 - configurable temperature thresholds that trigger either a Ringhio
-  notification or execute a configurable commandline.
+  notification or execute a configurable commandline,
 
 @endnode
 @node INSTALLATION "Installation"
@@ -97,6 +98,8 @@ tooltypes are available:
   the system's text pen.
 - SHADOWCOLOR (STRING): the hexa RGB color to use for the text shadow.
   By default the system's block pen.
+- BACKCOLOR (STRING): the hexa RGB color to use for the background. By
+  default no background color is applied, i.e. background is transparent.
 - GRAPHCOLOR_UP (STRING): the hexa RGB color to use for the top of the
   gradient. By default red 0xFF0000.
 - GRAPHCOLOR_DOWN (STRING): the hexa RGB color to use for the bottom of
@@ -149,7 +152,6 @@ Future development of this docky involves:
 - replace tooltype configuration by application.library built-in XML
   configuration feature
 - localize setup script and Ringhio notifications messages
-- add an option to draw a background instead of being transparent
 
 @endnode
 @node HISTORY "History"
@@ -171,6 +173,8 @@ Future development of this docky involves:
                     - (FIX) Install script refers to static dev path (zzd10h)
                     - (ADD) Specific icon for the Ringhio notification by
                             TommySammy
+- 53.6, xx/04/2013: - (ADD) BACKCOLOR tooltype to draw a filled background
+                            instead of using a transparent one (zzd10h)
 
 @endnode
 @node CONTACT "Contact Me"

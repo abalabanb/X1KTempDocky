@@ -75,14 +75,13 @@ struct DockyData {
     struct DrawInfo *dri;
 
 	struct Screen *scr;
-	uint16 shadowpen, textpen, graphpen;
+	uint16 shadowpen, textpen, backpen;
 	struct Pos MBPos, CPUPos, Core1Pos, Core2Pos;
 
 	BOOL freefont;
 	BOOL blink;
 
-	uint32 shadowcolor;
-	uint32 textcolor;
+	uint32 shadowcolor, textcolor, backcolor;
     uint32 graphcolor, graphcolor2;
     struct GradientSpec GradSpecGraph;
 
