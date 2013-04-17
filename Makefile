@@ -29,7 +29,7 @@ VERSION = 53
 # Source code files used in this project
 # Add any additional files to this line
 
-SRCS = init.c docky.c cfg.c readtemp.c
+SRCS = init.c docky.c cfg.c readtemp.c locale_support.c
 
 # -------------------------------------------------------------
 # Nothing should need changing below this line
@@ -38,6 +38,12 @@ OBJS = $(SRCS:.c=.o)
 # Rules for building
 $(TARGET): $(OBJS)
 	$(CC) $(LINK) -nostdlib -o $(TARGET) $(OBJS) $(LIBS)
+
+locale.h: X1kTemp.cd
+	Catcomp $^ CFILE $@ NOCODE
+
+%.catalog: X1kTemp.cd %.ct
+	CatComp $^ CATALOG $(amigapath $@)
 
 .PHONY: clean
 clean:
@@ -56,7 +62,8 @@ revision:
 	bumprev $(VERSION) $(TARGET)
 
 init.o: dockybase.h X1kTemp.docky_rev.h
-docky.o: dockybase.h X1kTemp.docky_rev.h
+docky.o: dockybase.h X1kTemp.docky_rev.h locale_support.h
 init.o: dockybase.h X1kTemp.docky_rev.h
 readtemp.o: dockybase.h X1kTemp.docky_rev.h
-
+locale_support.o: locale_support.h locale.h
+locale_support.h: locale.h

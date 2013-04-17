@@ -31,6 +31,7 @@
 
 #include "dockybase.h"
 #include "cfg.h"
+#include "locale_support.h"
 
 #define RGB8to32(RGB)   ((uint32)(RGB) * 0x01010101UL)
 #define RED(a)          (((a)>>16) & 0xFF)
@@ -93,9 +94,10 @@ uint32 DockyObtain (struct DockyIFace *Self) {
 	struct DockyBase *db = (struct DockyBase *)Self->Data.LibBase;
 	struct DockyData *dd = (struct DockyData *)((uint8 *)Self - Self->Data.NegativeSize);
 
+    OpenLocaleCatalog(dd, "X1kTemp.catalog");
     dd->nAppID = IApplication->RegisterApplication("X1kTemp",
             REGAPP_URLIdentifier, "balaban.fr",
-            REGAPP_Description, "Temperature monitor docky",
+            REGAPP_Description,  GetString(dd, MSG_APPLIB_DESCRIPTION) ,
             TAG_DONE);
     IExec->DebugPrintF("[RegisterApplication] AppId=%ld\n", dd->nAppID);
 
@@ -107,6 +109,7 @@ uint32 DockyRelease (struct DockyIFace *Self) {
 	struct DockyBase *db = (struct DockyBase *)Self->Data.LibBase;
 	struct DockyData *dd = (struct DockyData *)((uint8 *)Self - Self->Data.NegativeSize);
 
+    CloseLocaleCatalog(dd);
     IExec->DebugPrintF("[UnregisterApplication] before unreg %ld %08x\n", dd->nAppID, IApplication);
     IApplication->UnregisterApplicationA(dd->nAppID, NULL);
     IExec->DebugPrintF("[UnregisterApplication] after\n");
@@ -435,10 +438,10 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
     uint8 nCorIdx = dd->curIdx?dd->curIdx-1:dd->maxIdx-1;
 
     // check warning temperatures
-    CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx], "Case");
-    CheckWarnTemperatures(dd, dd->CPUWarnTemp, dd->CPUTemp[nCorIdx], "CPU");
-    CheckWarnTemperatures(dd, dd->Core1WarnTemp, dd->Core1Temp[nCorIdx], "Core1");
-    CheckWarnTemperatures(dd, dd->Core2WarnTemp, dd->Core2Temp[nCorIdx], "Core2");
+    CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx],  GetString(dd, MSG_RINGHIO_CASE_LABEL) );
+    CheckWarnTemperatures(dd, dd->CPUWarnTemp, dd->CPUTemp[nCorIdx],  GetString(dd, MSG_RINGHIO_CPU_LABEL) );
+    CheckWarnTemperatures(dd, dd->Core1WarnTemp, dd->Core1Temp[nCorIdx],  GetString(dd, MSG_RINGHIO_CORE1_LABEL) );
+    CheckWarnTemperatures(dd, dd->Core2WarnTemp, dd->Core2Temp[nCorIdx],  GetString(dd, MSG_RINGHIO_CORE2_LABEL) );
 
     // handling environnement variables
     if(dd->bSetEnv)
@@ -520,7 +523,7 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 
         TEXT cUnit = dd->bUseFahrenheit?'F':'C';
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "Case:  %3ld°%lc", dd->MBTemp[nCorIdx], cUnit);
+        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CASE_FORMAT) , dd->MBTemp[nCorIdx], cUnit);
 		IGraphics->SetFont(dd->rp, dd->font);
 		IGraphics->Move(dd->rp, dd->MBPos.x+1, dd->MBPos.y+1);
 		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
@@ -529,7 +532,7 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "CPU:   %3ld°%lc", dd->CPUTemp[nCorIdx], cUnit);
+        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CPU_FORMAT) , dd->CPUTemp[nCorIdx], cUnit);
 		IGraphics->Move(dd->rp, dd->CPUPos.x+1, dd->CPUPos.y+1);
 		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
@@ -537,7 +540,7 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "Core1: %3ld°%lc", dd->Core1Temp[nCorIdx], cUnit);
+        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CORE1_FORMAT) , dd->Core1Temp[nCorIdx], cUnit);
 		IGraphics->Move(dd->rp, dd->Core1Pos.x+1, dd->Core1Pos.y+1);
 		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
@@ -545,7 +548,7 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1, "Core2: %3ld°%lc", dd->Core2Temp[nCorIdx], cUnit);
+        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CORE2_FORMAT) , dd->Core2Temp[nCorIdx], cUnit);
 		IGraphics->Move(dd->rp, dd->Core2Pos.x+1, dd->Core2Pos.y+1);
 		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
 		IGraphics->Text(dd->rp, tmp, strlen(tmp));
@@ -575,10 +578,10 @@ static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, u
             {
                 TEXT tmp[129];
                 IUtility->SNPrintf(tmp, sizeof(tmp)/sizeof(TEXT),
-                                    "%s temperature passed above %ld°%lc",
+                                    GetString(dd, MSG_RINGHIO_BODY_FORMAT) ,
                                     szSensor, nTempThreshold, dd->bUseFahrenheit?'F':'C');
                 uint32 result = IApplication->Notify(dd->nAppID,
-                                    APPNOTIFY_Title,        "X1KTemp Docky - Temperature Warning",
+                                    APPNOTIFY_Title,         GetString(dd, MSG_RINGHIO_TITLE),
                                     APPNOTIFY_Update,        FALSE,
                                     APPNOTIFY_Pri,           0,
                                     APPNOTIFY_PubScreenName, "FRONT",

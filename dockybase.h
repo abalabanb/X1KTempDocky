@@ -51,6 +51,8 @@
 #include <proto/expansion.h>
 #include <proto/application.h>
 #include <proto/timer.h>
+#include <proto/locale.h>
+
 #include <interfaces/docky.h>
 
 struct DockyBase;
@@ -109,6 +111,10 @@ struct DockyData {
     struct MsgPort *pAppLibPort;
     BOOL bAlreadyNotified;
     TEXT szImageFile[2048];
+
+    // locale part
+    struct Catalog     *Catalog;
+	uint32             CodeSet;
 };
 
 #define DDF_BLINK 1
@@ -126,12 +132,14 @@ struct DockyBase {
     struct PCIIFace *IPCI;
     struct TimerIFace *ITimer;
     struct ApplicationIFace *IApplication;
+    struct LocaleIFace *ILocale;
 
 	struct Library *IntuitionLib;
 	struct GfxBase *GfxLib;
 	struct Library *DiskfontLib;
     struct Library *ExpansionLib;
     struct Library *ApplicationLib;
+    struct Library *LocaleLib;
 
     struct MsgPort *TimerPort;
     struct TimeRequest *TimerRequest;
@@ -150,6 +158,7 @@ struct DockyBase {
 #define ITimer db->ITimer
 #define IPCI db->IPCI
 #define IApplication db->IApplication
+#define ILocale db->ILocale
 
 #define ExecLib db->ExecLib
 #define IntuitionLib db->IntuitionLib
@@ -157,6 +166,7 @@ struct DockyBase {
 #define DiskfontLib db->DiskfontLib
 #define ExpansionLib db->ExpansionLib
 #define ApplicationLib db->ApplicationLib
+#define LocaleLib db->LocaleLib
 
 uint32 DockyObtain (struct DockyIFace *Self);
 uint32 DockyRelease (struct DockyIFace *Self);

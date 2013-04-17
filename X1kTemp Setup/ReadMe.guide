@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.5 (15.04.13)
+@$VER: ReadMe Guide 53.6 (15.04.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-    @{fg shine}X1kTemp Docky v53.5@{fg text}
+    @{fg shine}X1kTemp Docky v53.6@{fg text}
 ---------------------------
 @{i}A temperature monitor docky
 for the AmigaOne X1000.@{ui}
@@ -74,6 +74,7 @@ X1kTemp Docky has the following features:
 - support AmiUpdate for future updates,
 - configurable temperature thresholds that trigger either a Ringhio
   notification or execute a configurable commandline,
+- localized messages.
 
 @endnode
 @node INSTALLATION "Installation"
@@ -106,20 +107,20 @@ tooltypes are available:
   the gradient. By default green 0x006400.
 - REFRESH (INTEGER): ther refresh rate in 1/50th of seconds. By default
   50, i.e. a refresh each second.
-- SETENV (YES|NO): activate or not the environnement variable setting.
+- SETENV (YES|NO): activate or not the @{"environnement variable setting " link "ENVVAR"}.
   By default environnement variables are not set.
 - FAHRENHEIT (YES|NO): activate or not the conversion to the Fahrenheit
   scale. By default temperatures are displayed using the Celsius scale.
 - LOCAL_WARN (INTEGER): temperature threshold for the local sensor above
-  which a warning should be emitted.
+  which a warning should be emitted. By default no warning.
 - CPU_WARN (INTEGER): temperature threshold for the CPU sensor above
-  which a warning should be emitted.
+  which a warning should be emitted. By default no warning.
 - CORE1_WARN (INTEGER): temperature threshold for the first core sensor
-  above which a warning should be emitted.
+  above which a warning should be emitted. By default no warning.
 - CORE2_WARN (INTEGER): temperature threshold for the second sensor
-  above which a warning should be emitted.
+  above which a warning should be emitted. By default no warning.
 - WARN_CMD (STRING): command to execute when any of the above temperature
-  is reached. By default if a Ringhio notification will be issued.
+  is reached. By default if no set a Ringhio notification will be issued.
 
 Note that after each tooltype the datatype or allowed values are listed
 between parenthesis.
@@ -151,7 +152,7 @@ At the moment no bugs are known.
 Future development of this docky involves:
 - replace tooltype configuration by application.library built-in XML
   configuration feature
-- localize setup script and Ringhio notifications messages
+- localize setup script
 
 @endnode
 @node HISTORY "History"
@@ -175,6 +176,7 @@ Future development of this docky involves:
                             TommySammy
 - 53.6, xx/04/2013: - (ADD) BACKCOLOR tooltype to draw a filled background
                             instead of using a transparent one (zzd10h)
+                    - (ADD) Localized messages
 
 @endnode
 @node CONTACT "Contact Me"
