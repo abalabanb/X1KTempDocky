@@ -1,6 +1,6 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.6 (15.04.13)
+@$VER: ReadMe Guide 53.6 (18.04.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
@@ -14,7 +14,7 @@ for the AmigaOne X1000.@{ui}
 @{" Features                 " link "FEATURES"}
 @{" Installation             " link "INSTALLATION"}
 @{" Configuration            " link "CONFIGURATION"}
-@{" Environnement variables  " link "ENVVAR"}
+@{" Environment variables    " link "ENVVAR"}
 @{" Known Bugs and Future    " link "BUGS"}
 @{" History                  " link "HISTORY"}
 @{" Contact Me               " link "CONTACT"}
@@ -49,7 +49,7 @@ By using and running X1kTemp docky you are agreeing to the above terms.
 X1kTemp Docky for AmigaOS 4.1, is a plugin for the AmiDock toolbar system
 exclusively reserved to AEon's AmigaOne-X1000 machine. It aims at displaying
 the current values from the temperature sensors.
-A1-X1k has four temperature sensors one for the ambient (aka motherboard),
+A1-X1k has four temperature sensors one for the local (aka case),
 one for the SOC (aka CPU) and one for each Core.
 
 The operating temperatures of the components are:
@@ -67,7 +67,7 @@ X1kTemp Docky has the following features:
 - displays current temperature for each four sensors,
 - displays up to 72 temperature historic values,
 - optional temperature conversion to Fahrenheit scale,
-- optional setting of environnement variables for each sensor's temperature,
+- optional setting of @{"environment variables" link "ENVVAR"} for each sensor's temperature,
 - transparent background or filled background,
 - configurable font name and size,
 - configurable colors for texts, gradient and background,
@@ -81,7 +81,7 @@ X1kTemp Docky has the following features:
 @{fg shine}Installation@{fg text}
 ------------
 
-Just use the provided @{"installer" system "Setup >con://///AUTO/WAIT/CLOSE"}.
+Just use the provided @{"installer" system "WBRun Setup"}.
 
 @endnode
 @node CONFIGURATION "Configuration"
@@ -102,13 +102,13 @@ tooltypes are available:
 - BACKCOLOR (STRING): the hexa RGB color to use for the background. By
   default no background color is applied, i.e. background is transparent.
 - GRAPHCOLOR_UP (STRING): the hexa RGB color to use for the top of the
-  gradient. By default red 0xFF0000.
+  gradient. By default red FF0000.
 - GRAPHCOLOR_DOWN (STRING): the hexa RGB color to use for the bottom of
-  the gradient. By default green 0x006400.
+  the gradient. By default green 006400.
 - REFRESH (INTEGER): ther refresh rate in 1/50th of seconds. By default
   50, i.e. a refresh each second.
-- SETENV (YES|NO): activate or not the @{"environnement variable setting " link "ENVVAR"}.
-  By default environnement variables are not set.
+- SETENV (YES|NO): activate or not the @{"environment variable setting " link "ENVVAR"}.
+  By default environment variables are not set.
 - FAHRENHEIT (YES|NO): activate or not the conversion to the Fahrenheit
   scale. By default temperatures are displayed using the Celsius scale.
 - LOCAL_WARN (INTEGER): temperature threshold for the local sensor above
@@ -126,12 +126,12 @@ Note that after each tooltype the datatype or allowed values are listed
 between parenthesis.
 
 @endnode
-@node ENVVAR "Environnement variables"
-@{fg shine}Environnement variables@{fg text}
------------------------
+@node ENVVAR "Environment variables"
+@{fg shine}Environment variables@{fg text}
+---------------------
 
 When the option 'SETENV' is activated X1kTemp sets the following
-environnement varibales:
+environment varibales:
 - LocalTemp: the temperature of the motherboard.
 - CPUTemp: the temperature of the SOC.
 - Core1Temp: the temperature of the first core.
@@ -174,9 +174,10 @@ Future development of this docky involves:
                     - (FIX) Install script refers to static dev path (zzd10h)
                     - (ADD) Specific icon for the Ringhio notification by
                             TommySammy
-- 53.6, xx/04/2013: - (ADD) BACKCOLOR tooltype to draw a filled background
+- 53.6, 18/04/2013: - (ADD) BACKCOLOR tooltype to draw a filled background
                             instead of using a transparent one (zzd10h)
                     - (ADD) Localized messages
+                    - (ADD) French manual
 
 @endnode
 @node CONTACT "Contact Me"
@@ -185,9 +186,9 @@ Future development of this docky involves:
 
 I can be contacted for any feedback, bug report, enhancement request by
 email at the following address:
-alexandre(@)balaban.fr
+@{"alexandre(@)balaban.fr" system "urlopen mailto:alexandre@balaban.fr"}
 
-My website is http://www.balaban.fr
+My website is @{"http://www.balaban.fr" system "urlopen http://www.balaban.fr"}
 
 @endnode
 @node CREDITS "Credits & Acknowledgements"
