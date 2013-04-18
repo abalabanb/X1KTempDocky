@@ -152,7 +152,6 @@ At the moment no bugs are known.
 Future development of this docky involves:
 - replace tooltype configuration by application.library built-in XML
   configuration feature
-- localize setup script
 
 @endnode
 @node HISTORY "History"
@@ -178,6 +177,7 @@ Future development of this docky involves:
                             instead of using a transparent one (zzd10h)
                     - (ADD) Localized messages
                     - (ADD) French manual
+                    - (ADD) Localized setup
 
 @endnode
 @node CONTACT "Contact Me"

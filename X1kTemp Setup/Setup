@@ -27,6 +27,7 @@
     (set #string_esc "[2p")
 )
 
+
 ; english strings
 
 (
@@ -58,7 +59,7 @@
         (set #string_welcome                  "Welcome to X1kTemp.docky Setup!\n\nThis program installs X1kTemp Docky 53.5 on your computer.")
         (set #string_welcome_install          "INSTALL")
 
-        (set #string_license                  "LICENSE\nX1kTemp Docky 53.5 ©2013 Alexandre BALABAN, All Rights Reserved.\nTHIS SOFTWARE IS PROTECTED BY INTERNATIONAL AND NATIONAL LAWS. UNAUTHORIZED DISTRIBUTION OR RENTAL OF THIS SOFTWARE OR ONE OF ITS COMPONENTS ARE PROSECUTED TO THE FULLEST EXTENT POSSIBLE. FOR FULL COPYRIGHT INFORMATION, PLEASE READ THE INCLUDED LICENSE DOCUMENT.")
+        (set #string_license                  "LICENSE\nX1kTemp Docky 53.5 ©2013 Alexandre BALABAN, All Rights Reserved.\nTHIS SOFTWARE IS PROTECTED BY INTERNATIONAL AND NATIONAL LAWS. UNAUTHORIZED DISTRIBUTION OR RENTAL OF THIS SOFTWARE OR ONE OF ITS COMPONENTS ARE PROSECUTED TO THE FULLEST EXTENT POSSIBLE.")
         (set #string_license_accept           "I accept the terms of the license agreement")
 
         (set #studio_installerror             "An error has occured during the installation. The error description can be found in the logfile t:install.logfile (if log file creation has been enabled). The error code is:\n\n%ld\n\nIf the problem persists after repeating the installation, please contact alexandre@balaban.fr.")
@@ -72,10 +73,64 @@
 
         (set #string_components_software      "Software")
         (set #string_components_manuals       "Manuals")
+        (set #string_components_catalogs      "Catalogs")
 
         (set #string_startup                  "Make required changes to the s:user-startup file of your computer?")
 
         (set #string_add_docky                "The installer can automatically add the docky into AmiDock.\nHowever it can only install it into the main dock.\n\nDo you want to add the docky into AmiDock?")
+    )
+)
+
+; French strings
+
+(if (= @language "french")
+    (
+        (set #string_installer                "Le programme d'installation de votre système (%ld.%ld) est trop vieux !\n\nCe script nécessite installer version 43 ou supérieure. Vous pouvez trouver une version adaptée sur le CD de votre OS ou dans le NDK d'OS3.9. Lors de la mise à jour d'Installer, ne laissez pas d'anciennces version sur votre système (par exemple une nouvelle version dans C: et une ancienne dans SYS:Tools) !")
+
+        (set #string_path                     "Choisissez un chemin pour l'installation :")
+        (set #string_path_newdir              "Choisissez un chemin pour l'installation. Le programme d'installation va créer le répertoire « %s » dans l'emplacement spécifié :")
+
+        (set #string_selectfile               "Choisissez un fichier :")
+        (set #string_selectdirectory          "Choisissez un répertoire :")
+
+        (set #string_createdirerror           "Impossible de créer le répertoire :\n%s")
+
+        (set #string_runcommanderror          "ATTENTION : \"%s\" a renvoyé le code d'erreur %ld!\n\nLigne de commande :\n%s")
+
+        (set #string_uninstall_yes            "DÉSINSTALLER")
+        (set #string_uninstall_no             "Sauter")
+
+        (set #string_again                    "RÉESSAYER")
+        (set #string_skip                     "Sauter")
+        (set #string_ignore                   "Ignorer")
+
+        (set #string_success                  "Installation terminée !\n\nLe logiciel a été installé.")
+        (set #string_success_verbose          "Installation terminée !\n\nLe logiciel a été installé dans :\n\"%s\"")
+
+        (set #string_old                      "La version installée est trop ancienne pour être mise à jour. Veuillez la désinstaller et relancer cette installation.")
+
+        (set #string_welcome                  "Bienvenue dans l'installation de X1kTemp.docky !\n\nCe programme installe X1kTemp Docky %s sur votre ordinateur.")
+        (set #string_welcome_install          "INSTALLER")
+
+        (set #string_license                  "LICENCE\nX1kTemp Docky %s ©2013 Alexandre BALABAN, Tous Droits Réservés.\nCE LOGICIEL EST PROTEGÉ PAR LES LOIS INTERNATIONALES ET NATIONALES. LA DISTRIBUTION OU LA LOCATION DE CE LOGICIEL OU UN DE SES COMPOSANTS SONT POURSUIVIS DANS TOUTE LA MESURE DU POSSIBLE.")
+        (set #string_license_accept           "J'accepte les termes de l'accord de licence")
+
+        (set #studio_installerror             "Une erreur est survenue durant l'installation. La description de l'erreur peut être trouvée dans le fichier journal t:install.logfile (si la création de fichier journal a été activée). Le code d'erreur est :\n\n%ld\n\nSi le problème persiste après une nouvelle tentative d'installation, veuillez contacter alexandre@balaban.fr.")
+
+        (set #string_os                       "%s n'est pas compatible avec le système d'exploitation installé sur votre ordinateur !")
+        (set #string_cpu                      "%s n'est pas compatible avec le processeur présent dans votre ordinateur !")
+
+        (set #string_components_install       "Choisissez les composants à installer\n\n(Page %ld sur %ld) :")
+        (set #string_components_update        "Choisissez les composants à installer ou mettre à jour\n\n(Page %ld sur %ld):")
+        (set #string_components_help          "Choisissez les composants à installer.")
+
+        (set #string_components_software      "Logiciel")
+        (set #string_components_manuals       "Manuels")
+        (set #string_components_catalogs      "Catalogues")
+
+        (set #string_startup                  "Voulez-vous effectuer les changements nécessaires dans le fichier s:user-startup de votre ordinateur ?")
+
+        (set #string_add_docky                "L'installation peut automatiquement ajouter le docky dans AmiDock.\nCependant il ne peut que l'installer dans la barre principale.\n\nVoulez-vous ajouter le docky dans AmiDock ?")
     )
 )
 
@@ -266,6 +321,7 @@
 
 (set @components_software        1)
 (set @components_manuals         2)
+(set @components_catalogs        4)
 
 (set @os_1                       1)
 (set @os_2                       2)
@@ -283,12 +339,13 @@
 
 ; configure
 
-(set @app-name                  "X1kTemp Docky 53.3")
-(set @name                      "X1kTemp Docky 53.3")
+(set #app-version               "53.6")
+(set @app-name                  (cat "X1kTemp Docky " @app-version))
+(set @name                      (cat "X1kTemp Docky " @app-version))
 (set @short                     "X1kTemp.docky")
 (set @envs                      "X1kTemp.docky")
 
-(set @querytarget                @false) ; let user choose install path?
+(set @querytarget                @true) ; let user choose install path?
 (set @variants                   @false) ; let user choose install variant?
 (set @components                 @true ) ; let user choose install components?
 (set @uninstallable              @false) ; let user uninstall?
@@ -299,7 +356,7 @@
 (set @require_cpu                (+ @cpu_ppc))
 (set @components_min             (+ 0))
 (set @components_typical         (+ 0))
-(set @components_max             (+ @components_software @components_manuals))
+(set @components_max             (+ @components_software @components_manuals @components_catalogs))
 (set @components_custom          (+ 0))
 (set @components_firstinstall    (+ 0))
 
@@ -433,7 +490,7 @@
 (if (or (= #installed "") (= @uninstallable 0))
 
     (
-        (message (#string_welcome @short @name))
+        (message (#string_welcome #app-version @short @name))
 
         (set #install @install)
     )
@@ -444,7 +501,7 @@
 
         (askbool
 
-            (prompt (#string_welcome @short @name))
+            (prompt (#string_welcome #app-version @short @name))
 
             (help @askbool-help)
 
@@ -472,7 +529,7 @@
 
                 (askoptions
 
-                    (prompt #string_license)
+                    (prompt (#string_license #app-version))
 
                     (help @askoptions-help)
 
@@ -520,6 +577,7 @@
 
             (cat #string_esc #string_components_software     )
             (cat #string_esc #string_components_manuals      )
+            (cat #string_esc #string_components_catalogs     )
         )
 
         (default
@@ -608,6 +666,24 @@
             (dest #target)
             (nogauge)
             (optional "nofail" "force" "askuser")
+        )
+    )
+)
+
+; catalogs
+
+(if (bitand #variant (bitor @variant_max))
+
+    (
+        (if (or (= @language "french"))
+
+            (copyfiles
+
+                (source "Catalogs/french/X1kTemp.catalog")
+                (dest "locale:catalogs/french/")
+                (nogauge)
+                (optional "nofail" "force" "askuser")
+            )
         )
     )
 )

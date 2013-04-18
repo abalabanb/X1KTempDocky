@@ -183,6 +183,7 @@ Le développement futur de ce docky inclut :
                             instead of using a transparent one (zzd10h)
                     - (ADD) Localized messages
                     - (ADD) French manual
+                    - (ADD) Localized setup
 
 @endnode
 @node CONTACT "Contact"
