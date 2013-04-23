@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.6 (18.04.13)
+@$VER: ReadMe Guide 53.7 (24.04.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-    @{fg shine}X1kTemp Docky v53.6@{fg text}
+    @{fg shine}X1kTemp Docky v53.7@{fg text}
 ---------------------------
 @{i}A temperature monitor docky
 for the AmigaOne X1000.@{ui}
@@ -53,7 +53,7 @@ A1-X1k has four temperature sensors one for the local (aka case),
 one for the SOC (aka CPU) and one for each Core.
 
 The operating temperatures of the components are:
-- PASemi CPU: its operating temprature is up to 85°C.
+- PASemi CPU: its operating temperature is up to 85°C.
 - SB600 (no sensor): its operating temperature is 105°C as long as the case
   temperature is not greater than 45°C.
 
@@ -74,7 +74,21 @@ X1kTemp Docky has the following features:
 - support AmiUpdate for future updates,
 - configurable temperature thresholds that trigger either a Ringhio
   notification or execute a configurable commandline,
+- configurable timespan during which warning about a given sensor will not
+  be notified again,
 - localized messages.
+
+
+The notifications are issued when the docky detects that the @{"configured" link "CONFIGURATION"} warn
+temperature is reached. If no notification command is set a Ringhio
+notification is issued, else the notification command is executed.
+Anyway no further notification will be issued again for this sensor
+until a given timespan has passed.
+In case of Ringhio notification the user can double-click on the
+bubble this completely deactivates the notification for this sensor.
+@{i}@{fg shine}Be aware that running your computer for an extended period of time
+at or above the operating temperature may irrevocably damage your
+hardware.@{fg text}@{ui}
 
 @endnode
 @node INSTALLATION "Installation"
@@ -121,6 +135,8 @@ tooltypes are available:
   above which a warning should be emitted. By default no warning.
 - WARN_CMD (STRING): command to execute when any of the above temperature
   is reached. By default if no set a Ringhio notification will be issued.
+- WARN_TIMESPAN (INTEGER): timespan in seconds before which warning about
+  a sensor can't be notified again. By default it's fixed to 300 seconds.
 
 Note that after each tooltype the datatype or allowed values are listed
 between parenthesis.
@@ -178,6 +194,11 @@ Future development of this docky involves:
                     - (ADD) Localized messages
                     - (ADD) French manual
                     - (ADD) Localized setup
+- 53.7, 27/04/2013: - (ADD) Greek localization by to Anthony 'Phantom' Iliakis
+                    - (ADD) Greek manual by Anthony 'Phantom' Iliakis
+                    - (ADD) German localization by Thomas 'TommySammy' Blatt
+                    - (ADD) Reworked notification handling code
+
 
 @endnode
 @node CONTACT "Contact Me"
@@ -189,6 +210,9 @@ email at the following address:
 @{"alexandre(@)balaban.fr" system "urlopen mailto:alexandre@balaban.fr"}
 
 My website is @{"http://www.balaban.fr" system "urlopen http://www.balaban.fr"}
+
+If you want to translate X1kTemp into your native language then feel free
+to contact me.
 
 @endnode
 @node CREDITS "Credits & Acknowledgements"
@@ -204,6 +228,8 @@ My website is @{"http://www.balaban.fr" system "urlopen http://www.balaban.fr"}
   keeping the boing ball rolling.
 * Thanks to A-Eon Technology and Varisys for this fantastic machine that
   is the AmigaOne X1000.
+* Thanks Anthony 'Phantom' Iliakis for Greek translations and Thomas
+  'TommySammy' Blatt for German ones.
 
 @endnode
 

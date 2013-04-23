@@ -31,11 +31,18 @@ VERSION = 53
 
 SRCS = init.c docky.c cfg.c readtemp.c locale_support.c
 
+CTS = X1kTemp_fr.ct X1kTemp_de.ct X1kTemp_gr.ct
+
 # -------------------------------------------------------------
 # Nothing should need changing below this line
 
 OBJS = $(SRCS:.c=.o)
+
+CATALOGS = $(CTS:.ct=.catalog)
+
 # Rules for building
+all: $(TARGET) $(CATALOGS)
+
 $(TARGET): $(OBJS)
 	$(CC) $(LINK) -nostdlib -o $(TARGET) $(OBJS) $(LIBS)
 

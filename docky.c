@@ -38,13 +38,14 @@
 #define GREEN(a)        (((a)>>8)  & 0xFF)
 #define BLUE(a)         ((a)       & 0xFF)
 #define MAX_STRING_SIZE 12
+#define DEFAULT_TIMESPAN 300
 
 #define min(a,b) ((a)<=(b)?(a):(b))
 
 extern const struct TagItem dockyTags[];
 
 static void DockyRender (struct DockyBase *db, struct DockyData *dd);
-static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, CONST_STRPTR szSensor);
+static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, uint32 *pLastNotified, CONST_STRPTR szSensor);
 
 uint32 strlen(CONST_STRPTR str)
 {
@@ -138,6 +139,7 @@ struct DockyIFace *DockyClone (struct DockyIFace *Self) {
 		dd->shadowcolor = dd->textcolor = ~0;
         dd->graphcolor = 0xFF0000;
         dd->graphcolor2 = 0x006400;
+        dd->nMBLastWarned = dd->nCPULastWarned = dd->nCore1LastWarned = dd->nCore2LastWarned = 0;
 
         dd->bSetEnv = FALSE;
 
@@ -174,13 +176,14 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
     dd->graphcolor2 = 0x006400;
 
     dd->MBWarnTemp = dd->CPUWarnTemp = dd-> Core1WarnTemp = dd->Core2WarnTemp = ~0;
+    dd->nMBLastWarned = dd->nCPULastWarned = dd->nCore1LastWarned = dd->nCore2LastWarned = 0;
+    dd->nWarnTimespan = DEFAULT_TIMESPAN;
 
 	dd->font = GfxLib->DefaultFont;
 
     dd->bSetEnv = FALSE;
     dd->szWarnCmd[0] = '\0' ;
     IApplication->GetApplicationAttrs(dd->nAppID, APPATTR_Port, &dd->pAppLibPort, TAG_DONE);
-    dd->bAlreadyNotified = FALSE;
 
     IUtility->Strlcpy(dd->szImageFile, filename, 2048);
     STRPTR pFilePart = IDOS->FilePart(dd->szImageFile);
@@ -214,11 +217,13 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
 			struct TextFont *font;
 			ta.ta_Name = str;
 			ta.ta_YSize = val;
-			font = IDiskfont->OpenDiskFont(&ta);
+			font = IDiskfont->OpenDiskFont((struct TextAttr*)&ta);
 			if (font) {
 				dd->font = font;
 				dd->freefont = TRUE;
 			}
+            else
+            	IExec->DebugPrintF("[DockyProcess] could not open font\n");
 		}
 		
 		dd->shadowcolor = CFGHex(icon, "SHADOWCOLOR", 0);
@@ -233,6 +238,7 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
         dd->CPUWarnTemp = CFGInteger(icon, "CPU_WARN", ~0);
         dd->Core1WarnTemp = CFGInteger(icon, "CORE1_WARN", ~0);
         dd->Core2WarnTemp = CFGInteger(icon, "CORE2_WARN", ~0);
+        dd->nWarnTimespan = CFGInteger(icon, "WARN_TIMESPAN", DEFAULT_TIMESPAN);;
         STRPTR szTmp = CFGString(icon, "WARN_CMD", NULL);
         if(szTmp)
             IUtility->Strlcpy(dd->szWarnCmd, szTmp, 2048);
@@ -438,10 +444,10 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
     uint8 nCorIdx = dd->curIdx?dd->curIdx-1:dd->maxIdx-1;
 
     // check warning temperatures
-    CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx],  GetString(dd, MSG_RINGHIO_CASE_LABEL) );
-    CheckWarnTemperatures(dd, dd->CPUWarnTemp, dd->CPUTemp[nCorIdx],  GetString(dd, MSG_RINGHIO_CPU_LABEL) );
-    CheckWarnTemperatures(dd, dd->Core1WarnTemp, dd->Core1Temp[nCorIdx],  GetString(dd, MSG_RINGHIO_CORE1_LABEL) );
-    CheckWarnTemperatures(dd, dd->Core2WarnTemp, dd->Core2Temp[nCorIdx],  GetString(dd, MSG_RINGHIO_CORE2_LABEL) );
+    CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx],  &dd->nMBLastWarned, GetString(dd, MSG_RINGHIO_CASE_LABEL) );
+    CheckWarnTemperatures(dd, dd->CPUWarnTemp, dd->CPUTemp[nCorIdx],  &dd->nCPULastWarned, GetString(dd, MSG_RINGHIO_CPU_LABEL) );
+    CheckWarnTemperatures(dd, dd->Core1WarnTemp, dd->Core1Temp[nCorIdx],  &dd->nCore1LastWarned, GetString(dd, MSG_RINGHIO_CORE1_LABEL) );
+    CheckWarnTemperatures(dd, dd->Core2WarnTemp, dd->Core2Temp[nCorIdx],  &dd->nCore2LastWarned, GetString(dd, MSG_RINGHIO_CORE2_LABEL) );
 
     // handling environnement variables
     if(dd->bSetEnv)
@@ -459,14 +465,21 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
         IDOS->SetVar( "Core2Temp", szValue, -1, GVF_GLOBAL_ONLY );
     }
 
-    if(dd->bAlreadyNotified && dd->pAppLibPort)
+    if(dd->pAppLibPort)
     {
         struct ApplicationCustomMsg *pAppMsg = (struct ApplicationCustomMsg*)IExec->GetMsg(dd->pAppLibPort);
         if(pAppMsg)
         {
             if(APPLIBMT_CustomMsg == pAppMsg->almsg.type)
             {
-                dd->bAlreadyNotified = FALSE;
+                if(0 == IUtility->Stricmp(pAppMsg->customMsg, GetString(dd, MSG_RINGHIO_CASE_LABEL)))
+                    dd->nMBLastWarned = ~0;
+                else if(0 == IUtility->Stricmp(pAppMsg->customMsg, GetString(dd, MSG_RINGHIO_CPU_LABEL)))
+                    dd->nCPULastWarned = ~0;
+                else if(0 == IUtility->Stricmp(pAppMsg->customMsg, GetString(dd, MSG_RINGHIO_CORE1_LABEL)))
+                    dd->nCore1LastWarned = ~0;
+                else if(0 == IUtility->Stricmp(pAppMsg->customMsg, GetString(dd, MSG_RINGHIO_CORE2_LABEL)))
+                    dd->nCore2LastWarned = ~0;
             }
             IExec->ReplyMsg((struct Message*)pAppMsg);
         }
@@ -559,7 +572,7 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 }
 ///
 /// CheckWarnTemperatures
-static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, CONST_STRPTR szSensor)
+static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, uint32* pLastNotified, CONST_STRPTR szSensor)
 {
     if(((uint16)~0 != nTempThreshold) && (nTempValue >= nTempThreshold))
     {
@@ -567,9 +580,17 @@ static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, u
 #ifndef NDEBUG
     	IExec->DebugPrintF("[CheckWarnTemperatures] %s temperature exceeds %ld\n", szSensor, nTempThreshold);
 #endif
-
-        if(!dd->bAlreadyNotified)
+        struct DateStamp dsNow = {0};
+        IDOS->DateStamp(&dsNow);        
+        uint32 nNow = IDOS->DateStampToSeconds(&dsNow);
+#ifndef NDEBUG
+    	IExec->DebugPrintF("[CheckWarnTemperatures] now=%ld, old=%ld, timespan=%d\n", nNow, (uint32)*pLastNotified, dd->nWarnTimespan);
+#endif
+        if((~0 != *pLastNotified) && ((nNow - *pLastNotified) >= (uint32)dd->nWarnTimespan))
         {
+#ifndef NDEBUG
+        	IExec->DebugPrintF("[CheckWarnTemperatures] need notification\n");
+#endif
             if(0 != *dd->szWarnCmd)
             {
                 IDOS->System(dd->szWarnCmd, NULL);
@@ -587,12 +608,14 @@ static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, u
                                     APPNOTIFY_PubScreenName, "FRONT",
                                     APPNOTIFY_ImageFile,     dd->szImageFile,
                                     APPNOTIFY_CloseOnDC,     TRUE,
-                                    APPNOTIFY_BackMsg,       "Clicked",
+                                    APPNOTIFY_BackMsg,       szSensor,
                                     APPNOTIFY_Text,          tmp,
                                     TAG_DONE);
+#ifndef NDEBUG
             	IExec->DebugPrintF("[CheckWarnTemperatures] notify returned %ld\n", result);
+#endif
             }
-            dd->bAlreadyNotified = TRUE;
+            *pLastNotified = nNow;
         }
     }
 }

@@ -98,6 +98,8 @@ struct DockyData {
     // Warn temperatures for each sensor
     uint16 MBWarnTemp, CPUWarnTemp, Core1WarnTemp, Core2WarnTemp;
     TEXT szWarnCmd[2048];
+    uint32 nMBLastWarned, nCPULastWarned, nCore1LastWarned, nCore2LastWarned;
+    uint16 nWarnTimespan;
 
     uint32 refreshRate;
 
@@ -109,7 +111,6 @@ struct DockyData {
     // Application.library part
     uint32 nAppID;
     struct MsgPort *pAppLibPort;
-    BOOL bAlreadyNotified;
     TEXT szImageFile[2048];
 
     // locale part

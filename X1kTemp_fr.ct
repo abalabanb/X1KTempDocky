@@ -1,0 +1,47 @@
+## version $VER: X1kTemp.catalog 53.6 (17.04.2013)
+## codeset 111
+## language french
+;
+MSG_APPLIB_DESCRIPTION
+Docky de surveillance de température
+; Temperature monitor docky
+;
+MSG_CASE_FORMAT
+Boitier%3ld°%lc
+; Case:  %3ld°%lc
+;
+MSG_CPU_FORMAT
+CPU    %3ld°%lc
+; CPU:   %3ld°%lc
+;
+MSG_CORE1_FORMAT
+Coeur1 %3ld°%lc
+; Core1: %3ld°%lc
+;
+MSG_CORE2_FORMAT
+Coeur1 %3ld°%lc
+; Core2: %3ld°%lc
+;
+MSG_RINGHIO_TITLE
+X1KTemp - Averstissement de température
+; X1KTemp - Temperature Warning
+;
+MSG_RINGHIO_CASE_LABEL
+boitier
+; Case
+;
+MSG_RINGHIO_CPU_LABEL
+processeur
+; CPU
+;
+MSG_RINGHIO_CORE1_LABEL
+Coeur1
+; Core1
+;
+MSG_RINGHIO_CORE2_LABEL
+Coeur2
+; Core2
+;
+MSG_RINGHIO_BODY_FORMAT
+La température du %1$s a dépassé %2$ld°%3$lc
+; %s temperature passed above %ld°%lc

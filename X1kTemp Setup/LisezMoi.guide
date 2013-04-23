@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.6 (18.04.13)
+@$VER: ReadMe Guide 53.7 (24.04.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-      @{fg shine}X1kTemp Docky v53.6@{fg text}
+      @{fg shine}X1kTemp Docky v53.7@{fg text}
 -------------------------------
 @{i}  Un docky de surveillance de
 température pour AmigaOne X1000@{ui}
@@ -78,7 +78,21 @@ Le Docky X1kTemp dipose des fonctionnalités suivantes :
 - couleurs configurables pour les textes, dégradés et arrière-plan,
 - support d'AmiUpdate pour les mises à jour,
 - seuils de température configurables qui déclenchent soit une notification
-  Ringhio ou exécute une ligne de commande configurable.
+  Ringhio ou exécute une ligne de commande configurable,
+- délai configurable duranty lequel les avertissement à propos d'un capteur
+  ne seront plus notifiés,
+- messages localisés.
+
+Les notifications sont émises lorsque le docky détecte que la température
+d'avertissement @{"configurée" link "CONFIGURATION"} est atteinte. Si aucune commande de notification
+n'est indiquée une notification Ringhio est émise, sinon la commande de
+notification est exécutée. Dans tous les cas aucune autre notification n'est
+émise pour ce capteur tant qu'un certain délai n'est pas passé.
+Dans le cas de notification Ringhio l'utilisateur peut double-cliquer sur la
+bulle de notification, cela désactive complètement les notifications pour ce
+capteur. @{i}@{fg shine}Soyez avertis que laisser fonctionner votre ordinateur pendant une
+longue période de temps à sa température de fonctionnement ou au dessus peut
+causer des dégâts irrémédiables à votre matériel.@{fg text}@{ui}
 
 @endnode
 @node INSTALLATION "Installation"
@@ -126,6 +140,8 @@ icône. Les types d'outil suivants sont disponibles :
   au dessus duquel un avertissement sera émis. Par défaut aucun avertissement.
 - WARN_CMD (CHAINE) : commande à exécuter lorsque l'un des seuils ci-dessus
   atteint ou dépassé. Par défaut une notification Ringhio est lancée.
+- WARN_TIMESPAN (ENTIER): délai en secondes avant lequel les avertissements à
+  propos d'un capteur ne peuvent plus être notifiés. Par défaut 300 secondes.
 
 Veuillez noter qu'après chaque type d'outil le type de données ou la liste des
 valeurs autorisées est indiqué entre parenthèses.
@@ -184,6 +200,10 @@ Le développement futur de ce docky inclut :
                     - (ADD) Localized messages
                     - (ADD) French manual
                     - (ADD) Localized setup
+- 53.7, 27/04/2013: - (ADD) Greek localization by to Anthony 'Phantom' Iliakis
+                    - (ADD) Greek manual by Anthony 'Phantom' Iliakis
+                    - (ADD) German localization by Thomas 'TommySammy' Blatt
+                    - (ADD) Reworked notification handling code
 
 @endnode
 @node CONTACT "Contact"
@@ -195,6 +215,9 @@ demande d'évolution à l'adresse suivante :
 @{"alexandre(@)balaban.fr" system "urlopen mailto:alexandre@balaban.fr"}
 
 Mon site internet est @{"http://www.balaban.fr" system "urlopen http://www.balaban.fr"}
+
+Si vous souhaitez faire une traduction de X1kTemp dans votre langue n'hésitez
+pas à m'écrire.
 
 @endnode
 @node CREDITS "Crédits & Remerciements"
@@ -211,6 +234,9 @@ Mon site internet est @{"http://www.balaban.fr" system "urlopen http://www.balab
   continuer à faire tourner la boing balle.
 * Merci à A-Eon Technology et à Varisys pour cette fantastique machine qu'est
   l'AmigaOne X1000.
+* Merci à Anthony 'Phantom' Iliakis pour ses traductions Grecques et à Thomas
+  'TommySammy' Blatt pour les Allemandes.
+
 
 @endnode
 
