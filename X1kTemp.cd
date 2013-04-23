@@ -1,0 +1,36 @@
+#language english
+#version 53
+#basename X1kTemp
+;
+MSG_APPLIB_DESCRIPTION (1//)
+Temperature monitor docky
+;
+MSG_CASE_FORMAT (//)
+Case:  %3ld°%lc
+;
+MSG_CPU_FORMAT (//)
+CPU:   %3ld°%lc
+;
+MSG_CORE1_FORMAT (//)
+Core1: %3ld°%lc
+;
+MSG_CORE2_FORMAT (//)
+Core2: %3ld°%lc
+;
+MSG_RINGHIO_TITLE (//64)
+X1KTemp - Temperature Warning
+;
+MSG_RINGHIO_CASE_LABEL (//)
+Case
+;
+MSG_RINGHIO_CPU_LABEL (//)
+CPU
+;
+MSG_RINGHIO_CORE1_LABEL (//)
+Core1
+;
+MSG_RINGHIO_CORE2_LABEL (//)
+Core2
+;
+MSG_RINGHIO_BODY_FORMAT (//110)
+%s temperature passed above %ld°%lc
