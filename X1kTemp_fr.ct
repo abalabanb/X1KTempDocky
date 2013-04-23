@@ -43,5 +43,5 @@ Coeur2
 ; Core2
 ;
 MSG_RINGHIO_BODY_FORMAT
-La température du %1$s a dépassé %2$ld°%3$lc
-; %s temperature passed above %ld°%lc
+La température du %1$s a dépassé %2$ld°%3$lc. Double-cliquez ce message pour désactiver les notifications de ce capteur.
+; %s temperature passed above %ld°%lc. Double-click this message to deactivate further notifications from this sensor.

@@ -32,5 +32,5 @@ Core1
 MSG_RINGHIO_CORE2_LABEL (//)
 Core2
 ;
-MSG_RINGHIO_BODY_FORMAT (//110)
-%s temperature passed above %ld°%lc
+MSG_RINGHIO_BODY_FORMAT (//120)
+%s temperature passed above %ld°%lc. Double-click this message to deactivate further notifications from this sensor.
