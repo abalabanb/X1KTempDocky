@@ -15,6 +15,17 @@
     (set @language "french")
 )
 
+(if (= @language "greek")
+
+    (set @language "greek")
+)
+
+(if (= @language "italiano")
+
+    (set @language "italian")
+)
+
+
 ; ///
 ; /// strings
 ; ------------------------------------------------------------------------------
@@ -185,6 +196,59 @@
         (set #string_add_docky                "Η πρόγραμμα εγκατάστασης μπορεί αυτόματα να προσθέσει την εφαρμογή στο AmiDock.\nΠαρόλ' αυτ'α μπορεί μόνο να το εγκαταστήσει στην κύρια μπάρα.\n\nΘέλετε να προσθέσετε την εφαρμογή στο AmiDock;")
     )
 )
+
+(if (= @language "italian")
+    (
+        (set #string_installer                "Il programma di installazione presente nel tuo computer (%ld.%ld) θ troppo vecchio!\n\nQuesto script richiede l'installer versione 43 o superiore. Puoi trovare un installer adatto nel CD del tuo sistema operativo oppure nell'NDK di AmigaOS 3.9. In caso di aggiornamento si consiglia di non conservare la vecchia versione nel proprio sistema. (ad esempio la nuova versione in c: e la vecchia versione in sys:tools)!")
+
+        (set #string_path                     "Scegli un percorso di installazione:")
+        (set #string_path_newdir              "Scegli un percorso di installazione. Il programma di setup creerΰ una directory chiamata «%s» nel percorso specificato:")
+
+        (set #string_selectfile               "Seleziona un file:")
+        (set #string_selectdirectory          "Seleziona una directory:")
+
+        (set #string_createdirerror           "Impossibile creare la directory:\n%s")
+
+        (set #string_runcommanderror          "AVVISO: \"%s\" ha provocato un codice di errore %ld!\n\nLinea di comando:\n%s")
+
+        (set #string_uninstall_yes            "DISINSTALLA")
+        (set #string_uninstall_no             "Tralascia")
+
+        (set #string_again                    "PROVA ANCORA")
+        (set #string_skip                     "Tralascia")
+        (set #string_ignore                   "Ignora")
+
+        (set #string_success                  "Installazione completata!\n\nIl software θ stato installato correttamente.")
+        (set #string_success_verbose          "Installazione completata!\n\nIl software θ stato installato in:\n\"%s\"")
+
+        (set #string_old                      "La versione installata θ troppo vecchia per essere aggiornata. Si prega di disinstallare la vecchia versione e ripetere la procedura di installazione.")
+
+        (set #string_welcome                  "Benvenuti nel programma di installazione di X1kTemp.docky!\n\nQuesto programma installerΰ X1kTemp Docky %s sul tuo computer.")
+        (set #string_welcome_install          "INSTALLA")
+
+        (set #string_license                  "LICENZA\nX1kTemp Docky %s ©2013 di Alexandre BALABAN, Tutti i diritti sono riservati.\nQUESTO SOFTWARE E' PROTETTO DALLE NORME NAZIONALI ED INTERNAZIONALI INERENTI AL DIRITTO D'AUTORE. LA RIPRODUZIONE NON AUTORIZZATA, LA CESSIONE ANCHE IN FORMA DI PRESTITO DI UNO O PIU' COMPONENTI DI QUESTO SOFTWARE NON E' PERMESSA E PUO' ESSERE PERSEGUITA A NORMA DI LEGGE. PER ULTERIORI INFORMAZIONI CONSULTATE LA DOCUMENTAZIONE ALLEGATA.")
+        (set #string_license_accept           "Accetto i termini del contratto di licenza")
+
+        (set #studio_installerror             "Si θ verificato un errore durante la procedura di installazione. Una descrizione dettagliata dell'errore puς essere trovata nel file t:install.logfile (nel caso la creazione dei file di log sia stata attivata). Il codice di errore θ:\n\n%ld\n\nNel caso il problema persista anche dopo aver ripetuto l'installazione contattatemi al seguente indirizzo di posta elettronica: alexandre@balaban.fr")
+
+        (set #string_os                       "%s non θ compatibile con il sistema operativo installato su questo computer!")
+        (set #string_cpu                      "%s non θ compatibile con la CPU disponibile su questo computer!")
+
+        (set #string_components_install       "Seleziona i componenti da installare\n\n(Pagina %ld di %ld):")
+        (set #string_components_update        "Seleziona i componenti da installare o aggiornare\n\n(Pagina %ld di %ld):")
+        (set #string_components_help          "Selezione dei componenti che si desidera installare.")
+
+        (set #string_components_software      "Software")
+        (set #string_components_manuals       "Manuali")
+        (set #string_components_catalogs      "Cataloghi")
+
+        (set #string_startup                  "Si desidera apportare le modifiche necessarie al file s:user-startup presente nel tuo computer?")
+
+        (set #string_add_docky                "L'installer θ in grado di aggiungere automaticamente un docky su AmiDock,\ntuttavia potrΰ installarlo solo nel dock principale.\n\nSi desidera aggiungere un docky su AmiDock?")
+    )
+)
+
+
 ; ///
 ; /// procedures
 ; ------------------------------------------------------------------------------
