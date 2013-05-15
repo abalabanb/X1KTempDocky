@@ -454,7 +454,7 @@
 
 ; configure
 
-(set #app-version               "53.7")
+(set #app-version               "53.8")
 (set @app-name                  (cat "X1kTemp Docky " @app-version))
 (set @name                      (cat "X1kTemp Docky " @app-version))
 (set @short                     "X1kTemp.docky")
