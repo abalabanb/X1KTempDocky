@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.7 (24.04.13)
+@$VER: ReadMe Guide 53.8 (16.05.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-      @{fg shine}X1kTemp Docky v53.7@{fg text}
+      @{fg shine}X1kTemp Docky v53.8@{fg text}
 -------------------------------
 @{i}  Un docky de surveillance de
 température pour AmigaOne X1000@{ui}
@@ -60,7 +60,9 @@ Les températures de fonctionnement des composants sont :
 - processeur PASemi : sa température de fonctionnement monte jusqu'à 85°C.
 - SB600 (pas de capteur) : sa température de fonctionnement est de 105°C
   tant que la température ambiante ne dépasse pas 45°C.
-
+Ces valeurs (85°C pour les coeurs du processeur et 45°C pour le boitier
+consituent ce qui sera appelé @{i}températures critiques@{ui} dans la suite de ce
+document.
 @endnode
 
 @node FEATURES "Fonctionnalités"
@@ -81,6 +83,8 @@ Le Docky X1kTemp dipose des fonctionnalités suivantes :
   Ringhio ou exécute une ligne de commande configurable,
 - délai configurable duranty lequel les avertissement à propos d'un capteur
   ne seront plus notifiés,
+- possibilité d'exécuter une ligne de commande configurable ou d'éteindre
+  l'AmigaOne X1000 lorsque les températures critiques sont atteintes,
 - messages localisés.
 
 Les notifications sont émises lorsque le docky détecte que la température
@@ -88,11 +92,23 @@ d'avertissement @{"configurée" link "CONFIGURATION"} est atteinte. Si aucune com
 n'est indiquée une notification Ringhio est émise, sinon la commande de
 notification est exécutée. Dans tous les cas aucune autre notification n'est
 émise pour ce capteur tant qu'un certain délai n'est pas passé.
+
 Dans le cas de notification Ringhio l'utilisateur peut double-cliquer sur la
 bulle de notification, cela désactive complètement les notifications pour ce
-capteur. @{i}@{fg shine}Soyez avertis que laisser fonctionner votre ordinateur pendant une
-longue période de temps à sa température de fonctionnement ou au dessus peut
-causer des dégâts irrémédiables à votre matériel.@{fg text}@{ui}
+capteur.
+
+Dans le cas de notification Ringhio à propos des températures critique, il
+n'est pas possible de désactiver complètement le message. En fait lorsque
+l'utilisateur double-clique sur le message cela annulera juste le décompte
+pour l'arrêt de la machine de manière à ce qu'il puisse enregistrer son
+travail. Après un délai de trois minutes, et si les rempératures critiques
+sont toujours atteintes alors la notification sera renvoyée et l'arrêt
+relancé.
+
+@{i}@{fg shine}Soyez avertis que laisser fonctionner votre ordinateur pendant une longue
+période de temps à sa température de fonctionnement ou au dessus peut causer
+des dégâts irrémédiables à votre matériel.@{fg text}@{ui}
+
 
 @endnode
 @node INSTALLATION "Installation"
@@ -142,6 +158,9 @@ icône. Les types d'outil suivants sont disponibles :
   atteint ou dépassé. Par défaut une notification Ringhio est lancée.
 - WARN_TIMESPAN (ENTIER): délai en secondes avant lequel les avertissements à
   propos d'un capteur ne peuvent plus être notifiés. Par défaut 300 secondes.
+- CRITICAL_CMD (CHAINE): commande à exécuter lorsque l'une des températures
+  critique est atteinte. Par défaut cela engage un arrêt logiciel qui peut être
+  annulé en double-cliquant sur la notification Ringhio.
 
 Veuillez noter qu'après chaque type d'outil le type de données ou la liste des
 valeurs autorisées est indiqué entre parenthèses.
@@ -200,10 +219,18 @@ Le développement futur de ce docky inclut :
                     - (ADD) Localized messages
                     - (ADD) French manual
                     - (ADD) Localized setup
-- 53.7, 27/04/2013: - (ADD) Greek localization by to Anthony 'Phantom' Iliakis
+- 53.7, 27/04/2013: - (ADD) Greek localization by Anthony 'Phantom' Iliakis
                     - (ADD) Greek manual by Anthony 'Phantom' Iliakis
                     - (ADD) German localization by Thomas 'TommySammy' Blatt
                     - (ADD) Reworked notification handling code
+- 53.8, 20/05/2013: - (ADD) Italian localization by Samir 'Samo79' Hawamdeh
+                    - (ADD) Italian setup strings by Samir 'Samo79' Hawamdeh
+                    - (ADD) Critical temperature configurable command
+                    - (ADD) Ability to PowerOff the X1000 if critical temp
+                    - (ADD) Empty catalog translation file to stimulate
+                            translations (Samo79)
+                    - (FIX) Typo in French translation for Core2 (zzd10h)
+                    - (ADD) Updated translations
 
 @endnode
 @node CONTACT "Contact"
@@ -228,6 +255,7 @@ pas à m'écrire.
   Fredrik Wikstrom et Massimiliano Scarano comme exemple.
 * Le code de lecture de température a été généreusement fourni par
   Thomas Frieden.
+* La fonction d'arrêt est basée sur le code de PowerOff par Alex Carmona.
 * Les icônes ont été offerts par Thomas 'TommySammy' Blatt.
 * Un grand merci à Guillaume 'zzd10h' Boesel pour ses conseils et son aide.
 * Merci à Hyperion Entertainment et à tous les développeurs AmigaOS 4 pour

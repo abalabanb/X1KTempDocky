@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.7 (24.04.13)
+@$VER: ReadMe Guide 53.8 (12.05.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-    @{fg shine}X1kTemp Docky v53.7@{fg text}
+    @{fg shine}X1kTemp Docky v53.8@{fg text}
 ---------------------------
 @{i}A temperature monitor docky
 for the AmigaOne X1000.@{ui}
@@ -56,6 +56,8 @@ The operating temperatures of the components are:
 - PASemi CPU: its operating temperature is up to 85°C.
 - SB600 (no sensor): its operating temperature is 105°C as long as the case
   temperature is not greater than 45°C.
+Those values (85°C for the CPU cores and 45°C for the case) constitute what
+is called @{i}critical temperatures@{ui} latter on in this document.
 
 @endnode
 
@@ -76,6 +78,8 @@ X1kTemp Docky has the following features:
   notification or execute a configurable commandline,
 - configurable timespan during which warning about a given sensor will not
   be notified again,
+- ability to launch a configurable command line or to power off the AmigaOne
+  X1000 when critical temperature is reached,
 - localized messages.
 
 
@@ -84,11 +88,21 @@ temperature is reached. If no notification command is set a Ringhio
 notification is issued, else the notification command is executed.
 Anyway no further notification will be issued again for this sensor
 until a given timespan has passed.
+
 In case of Ringhio notification the user can double-click on the
 bubble this completely deactivates the notification for this sensor.
+
+In case of a Ringhio notification about a critical temperature, it's
+not possible to completely deactivate the message. In fact when the
+user double-clicks on the message it will just abort the shutdown
+so that he have the ability to save his work. After a delay of 3
+minutes and if the critical temperatures are still met then the
+notification will be reissued and the shutdown initiated again.
+
 @{i}@{fg shine}Be aware that running your computer for an extended period of time
 at or above the operating temperature may irrevocably damage your
 hardware.@{fg text}@{ui}
+
 
 @endnode
 @node INSTALLATION "Installation"
@@ -137,6 +151,9 @@ tooltypes are available:
   is reached. By default if no set a Ringhio notification will be issued.
 - WARN_TIMESPAN (INTEGER): timespan in seconds before which warning about
   a sensor can't be notified again. By default it's fixed to 300 seconds.
+- CRITICAL_CMD (STRING): command to execute when critical temperature is
+  reached. By default it will engage a software power off which can be
+  aborted by double-clicking the Ringhio notification.
 
 Note that after each tooltype the datatype or allowed values are listed
 between parenthesis.
@@ -194,11 +211,18 @@ Future development of this docky involves:
                     - (ADD) Localized messages
                     - (ADD) French manual
                     - (ADD) Localized setup
-- 53.7, 27/04/2013: - (ADD) Greek localization by to Anthony 'Phantom' Iliakis
+- 53.7, 27/04/2013: - (ADD) Greek localization by Anthony 'Phantom' Iliakis
                     - (ADD) Greek manual by Anthony 'Phantom' Iliakis
                     - (ADD) German localization by Thomas 'TommySammy' Blatt
                     - (ADD) Reworked notification handling code
-
+- 53.8, 15/05/2013: - (ADD) Italian localization by Samir 'Samo79' Hawamdeh
+                    - (ADD) Italian setup strings by Samir 'Samo79' Hawamdeh
+                    - (ADD) Critical temperature configurable command
+                    - (ADD) Ability to PowerOff the X1000 upon critical temp
+                    - (ADD) Empty catalog translation file to stimulate
+                            translations (Samo79)
+                    - (FIX) Typo in French translation for Core2 (zzd10h)
+                    - (ADD) Updated translations
 
 @endnode
 @node CONTACT "Contact Me"
@@ -222,6 +246,7 @@ to contact me.
 * X1kTemp Docky was developped using DateTime Docky by Fredrik Wikstrom
   and Massimiliano Scarano as an example.
 * The temperature reading code was kindly provided by Thomas Frieden.
+* The power off feature is based upon code from PowerOff by Alex Carmona.
 * The icon is a courtesy of Thomas 'TommySammy' Blatt.
 * Many thanks to Guillaume 'zzd10h' Boesel for is advises and help.
 * Thanks to Hyperion Entertainment and all AmigaOS 4 developpers for

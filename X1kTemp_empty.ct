@@ -1,0 +1,52 @@
+## version $VER: XX.catalog XX.XX (XX.XX.20XX)
+## codeset X
+## language X
+;
+MSG_APPLIB_DESCRIPTION
+
+; Temperature monitor docky
+;
+MSG_CASE_FORMAT
+
+; Case:  %3ld°%lc
+;
+MSG_CPU_FORMAT
+
+; CPU:   %3ld°%lc
+;
+MSG_CORE1_FORMAT
+
+; Core1: %3ld°%lc
+;
+MSG_CORE2_FORMAT
+
+; Core2: %3ld°%lc
+;
+MSG_RINGHIO_TITLE
+
+; X1KTemp - Temperature Warning
+;
+MSG_RINGHIO_CASE_LABEL
+
+; Case
+;
+MSG_RINGHIO_CPU_LABEL
+
+; CPU
+;
+MSG_RINGHIO_CORE1_LABEL
+
+; Core1
+;
+MSG_RINGHIO_CORE2_LABEL
+
+; Core2
+;
+MSG_RINGHIO_BODY_FORMAT
+
+; %s temperature passed above %ld°%lc. Double-click this message to deactivate further notifications from this sensor.
+;
+MSG_RINGHIO_BODY_CRITICAL
+
+; Temperature reached a critical point. System will shutdown in 4 seconds. Double-click this message to abort.
+;

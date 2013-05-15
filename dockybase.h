@@ -97,8 +97,13 @@ struct DockyData {
 
     // Warn temperatures for each sensor
     uint16 MBWarnTemp, CPUWarnTemp, Core1WarnTemp, Core2WarnTemp;
-    TEXT szWarnCmd[2048];
+    // Command lines for Warn temps and critical temps
+    TEXT szWarnCmd[2048], szCriticalCmd[2048];
+    // Timestamps in seconds the corresponding sensor was notified
     uint32 nMBLastWarned, nCPULastWarned, nCore1LastWarned, nCore2LastWarned;
+    // Timestamp in seconds critical temps was last notified
+    uint32 nCriticalLastNotified;
+    // Timespan in seconds before a warning can be reissued
     uint16 nWarnTimespan;
 
     uint32 refreshRate;

@@ -40,12 +40,20 @@
 #define MAX_STRING_SIZE 12
 #define DEFAULT_TIMESPAN 300
 
+#define MB_CRITICAL     dd->bUseFahrenheit?113:45
+#define CPU_CRITICAL    dd->bUseFahrenheit?185:85
+#define CRITICAL_TIMESPAN 180
+#define ABORT_SHUTDOWN  "ABORT_SHUTDOWN"
+
+
 #define min(a,b) ((a)<=(b)?(a):(b))
 
 extern const struct TagItem dockyTags[];
 
 static void DockyRender (struct DockyBase *db, struct DockyData *dd);
 static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, uint32 *pLastNotified, CONST_STRPTR szSensor);
+static void CheckCriticalTemperatures(struct DockyData *dd, uint16 nMB, uint16 nCore1, uint16 nCore2);
+static void TogglePowerOff(BOOL bActivate);
 
 uint32 strlen(CONST_STRPTR str)
 {
@@ -100,7 +108,10 @@ uint32 DockyObtain (struct DockyIFace *Self) {
             REGAPP_URLIdentifier, "balaban.fr",
             REGAPP_Description,  GetString(dd, MSG_APPLIB_DESCRIPTION) ,
             TAG_DONE);
-    IExec->DebugPrintF("[RegisterApplication] AppId=%ld\n", dd->nAppID);
+
+#ifndef NDEBUG
+   IExec->DebugPrintF("[RegisterApplication] AppId=%ld\n", dd->nAppID);
+#endif
 
     return ++Self->Data.RefCount;
 }
@@ -111,9 +122,13 @@ uint32 DockyRelease (struct DockyIFace *Self) {
 	struct DockyData *dd = (struct DockyData *)((uint8 *)Self - Self->Data.NegativeSize);
 
     CloseLocaleCatalog(dd);
+#ifndef NDEBUG
     IExec->DebugPrintF("[UnregisterApplication] before unreg %ld %08x\n", dd->nAppID, IApplication);
+#endif
     IApplication->UnregisterApplicationA(dd->nAppID, NULL);
+#ifndef NDEBUG
     IExec->DebugPrintF("[UnregisterApplication] after\n");
+#endif
 
 	Self->Data.RefCount--;
 	if (!Self->Data.RefCount && (Self->Data.Flags & IFLF_CLONED)) {
@@ -176,13 +191,14 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
     dd->graphcolor2 = 0x006400;
 
     dd->MBWarnTemp = dd->CPUWarnTemp = dd-> Core1WarnTemp = dd->Core2WarnTemp = ~0;
-    dd->nMBLastWarned = dd->nCPULastWarned = dd->nCore1LastWarned = dd->nCore2LastWarned = 0;
+    dd->nMBLastWarned = dd->nCPULastWarned = dd->nCore1LastWarned = dd->nCore2LastWarned = dd->nCriticalLastNotified = 0;
     dd->nWarnTimespan = DEFAULT_TIMESPAN;
 
 	dd->font = GfxLib->DefaultFont;
 
     dd->bSetEnv = FALSE;
     dd->szWarnCmd[0] = '\0' ;
+    dd->szCriticalCmd[0] = '\0';
     IApplication->GetApplicationAttrs(dd->nAppID, APPATTR_Port, &dd->pAppLibPort, TAG_DONE);
 
     IUtility->Strlcpy(dd->szImageFile, filename, 2048);
@@ -443,6 +459,9 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
 
     uint8 nCorIdx = dd->curIdx?dd->curIdx-1:dd->maxIdx-1;
 
+    // check critical temperatures
+    CheckCriticalTemperatures(dd, dd->MBTemp[nCorIdx], dd->Core1Temp[nCorIdx],  dd->Core2Temp[nCorIdx]);
+
     // check warning temperatures
     CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx],  &dd->nMBLastWarned, GetString(dd, MSG_RINGHIO_CASE_LABEL) );
     CheckWarnTemperatures(dd, dd->CPUWarnTemp, dd->CPUTemp[nCorIdx],  &dd->nCPULastWarned, GetString(dd, MSG_RINGHIO_CPU_LABEL) );
@@ -480,6 +499,8 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
                     dd->nCore1LastWarned = ~0;
                 else if(0 == IUtility->Stricmp(pAppMsg->customMsg, GetString(dd, MSG_RINGHIO_CORE2_LABEL)))
                     dd->nCore2LastWarned = ~0;
+                else if(0 == IUtility->Stricmp(pAppMsg->customMsg, ABORT_SHUTDOWN))
+                    TogglePowerOff(FALSE);
             }
             IExec->ReplyMsg((struct Message*)pAppMsg);
         }
@@ -586,7 +607,7 @@ static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, u
 #ifndef NDEBUG
     	IExec->DebugPrintF("[CheckWarnTemperatures] now=%ld, old=%ld, timespan=%d\n", nNow, (uint32)*pLastNotified, dd->nWarnTimespan);
 #endif
-        if((~0 != *pLastNotified) && ((nNow - *pLastNotified) >= (uint32)dd->nWarnTimespan))
+        if((~0 != *pLastNotified) && ((nNow - *pLastNotified) >= (uint32)dd->nWarnTimespan) && ((nNow - dd->nCriticalLastNotified) >= CRITICAL_TIMESPAN))
         {
 #ifndef NDEBUG
         	IExec->DebugPrintF("[CheckWarnTemperatures] need notification\n");
@@ -618,5 +639,52 @@ static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, u
             *pLastNotified = nNow;
         }
     }
+}
+///
+
+/// CheckCriticalTemperatures
+static void CheckCriticalTemperatures(struct DockyData *dd, uint16 nMB, uint16 nCore1, uint16 nCore2)
+{
+    if((MB_CRITICAL <= nMB) || (CPU_CRITICAL <= nCore1) || (CPU_CRITICAL <= nCore2))
+    {
+        struct DockyBase * db = dd->Base;
+
+        struct DateStamp dsNow = {0};
+        IDOS->DateStamp(&dsNow);
+        uint32 nNow = IDOS->DateStampToSeconds(&dsNow);
+
+        if((~0 != dd->nCriticalLastNotified) && ((nNow - dd->nCriticalLastNotified) >= CRITICAL_TIMESPAN))
+        {
+            if(0 != *dd->szCriticalCmd)
+            {
+                IDOS->System(dd->szCriticalCmd, NULL);
+            }
+            else
+            {
+                uint32 result = IApplication->Notify(dd->nAppID,
+                                    APPNOTIFY_Title,         GetString(dd, MSG_RINGHIO_TITLE),
+                                    APPNOTIFY_Update,        FALSE,
+                                    APPNOTIFY_Pri,           0,
+                                    APPNOTIFY_PubScreenName, "FRONT",
+                                    APPNOTIFY_ImageFile,     dd->szImageFile,
+                                    APPNOTIFY_CloseOnDC,     TRUE,
+                                    APPNOTIFY_BackMsg,       ABORT_SHUTDOWN,
+                                    APPNOTIFY_Text,          GetString(dd, MSG_RINGHIO_BODY_CRITICAL),
+                                    TAG_DONE);
+    #ifndef NDEBUG
+            	IExec->DebugPrintF("[CheckCriticalTemperatures] notify returned %ld\n", result);
+    #endif
+                TogglePowerOff(TRUE);
+            }
+            dd->nCriticalLastNotified = nNow;
+        }
+    }
+}
+///
+
+/// X1000 PowerOff
+static void TogglePowerOff(BOOL bActivate)
+{
+    *((uint8 *)(0xF5000007)) = bActivate?1:0;
 }
 ///
