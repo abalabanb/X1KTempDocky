@@ -1,4 +1,4 @@
-## version $VER: X1kTemp.catalog 53.6 (24.04.2013)
+## version $VER: X1kTemp.catalog 53.8 (17.05.2013)
 ## language greek
 ## codeset 10
 ;
@@ -50,3 +50,7 @@ MSG_RINGHIO_CORE2_LABEL
 MSG_RINGHIO_BODY_FORMAT
 Η θερμοκρασία %s ξεπέρασε τους %ld°%lc. Κάντε διπλό-κλικ εδώ για να μην λάβετε άλλες ειδοποίησεις από αυτόν τον αισθητήρα.
 ; %s temperature passed above %ld°%lc. Double-click this message to deactivate further notifications from this sensor.
+;
+MSG_RINGHIO_BODY_CRITICAL
+Η θερμοκρασία έφτασε σε κρίσιμο σημείο. Το σύστημα θα τερματίσει σε 4 δευτερόλεπτα. Διπλό-κλικ εδώ για ματαίωση.
+; Temperature reached a critical point. System will shutdown in 4 seconds. Double-click this message to abort.

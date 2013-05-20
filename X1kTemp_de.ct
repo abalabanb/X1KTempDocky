@@ -1,4 +1,4 @@
-## version $VER: X1kTemp.catalog 53.6 (24.04.2013)
+## version $VER: X1kTemp.catalog 53.8 (17.05.2013)
 ## language german
 ## codeset 111
 ;
@@ -47,3 +47,8 @@ Core2
 MSG_RINGHIO_BODY_FORMAT
 %s Temperatur weitergegeben %ld°%lc.Doppelklicken Sie auf diese Nachricht,um Meldungen von diesem Sensor zu deaktivieren.
 ; %s temperature passed above %ld°%lc. Double-click this message to deactivate further notifications from this sensor.
+;
+MSG_RINGHIO_BODY_CRITICAL
+Temperatur hat kritischen Punkt erreicht.System wird in 4 Sekunden heruntergefahren.Doppelklick auf die Nachricht,um abzubrechen.
+; Temperature reached a critical point. System will shutdown in 4 seconds. Double-click this message to abort.
+

@@ -1,7 +1,7 @@
-## version $VER: X1kTemp.catalog 53.7 (29.04.2013)
+## version $VER: X1kTemp.catalog 53.8 (18.05.2013)
 ## codeset 111
 ## language italiano
-;## chunk AUTH Translated by Samir Hawamdeh (http://www.betatesting.it/backforthefuture)
+## chunk AUTH Translated by Samir Hawamdeh (http://www.betatesting.it/backforthefuture)
 ;
 ; ATO Italia
 ; Compiled with FlexCat 2.12 PPC (AmigaOS4)
@@ -25,11 +25,11 @@ CPU:   %3ld°%lc
 ; CPU:   %3ld°%lc
 ;
 MSG_CORE1_FORMAT
-Core 1: %3ld°%lc
+Core1: %3ld°%lc
 ; Core1: %3ld°%lc
 ;
 MSG_CORE2_FORMAT
-Core 2: %3ld°%lc
+Core2: %3ld°%lc
 ; Core2: %3ld°%lc
 ;
 MSG_RINGHIO_TITLE
@@ -45,13 +45,18 @@ CPU
 ; CPU
 ;
 MSG_RINGHIO_CORE1_LABEL
-Core 1
+Core1
 ; Core1
 ;
 MSG_RINGHIO_CORE2_LABEL
-Core 2
+Core2
 ; Core2
 ;
 MSG_RINGHIO_BODY_FORMAT
-La temperatura %s è salita a %ld°%lc. Doppio click su questo messaggio per disattivare ulteriori notifiche da questo sensore.
+La temperatura della %s è salita a %ld°%lc. Doppio click sul messaggio per disattivare ulteriori notifiche da questo sensore
 ; %s temperature passed above %ld°%lc. Double-click this message to deactivate further notifications from this sensor.
+;
+MSG_RINGHIO_BODY_CRITICAL
+La temperatura ha raggiunto un punto critico. Il sistema verrà spento entro 4 secondi. Doppio click sul messaggio per annullare
+; Temperature reached a critical point. System will shutdown in 4 seconds. Double-click this message to abort.
+;
