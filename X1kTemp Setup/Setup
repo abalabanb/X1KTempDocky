@@ -844,6 +844,16 @@
                 (optional "nofail" "force" "askuser")
             )
         )
+        (if (or (= @language "italian"))
+
+            (copyfiles
+
+                (source "Catalogs/italian/X1kTemp.catalog")
+                (dest "locale:catalogs/italian/")
+                (nogauge)
+                (optional "nofail" "force" "askuser")
+            )
+        )
     )
 )
 
