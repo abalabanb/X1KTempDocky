@@ -1,0 +1,52 @@
+## version $VER: X1kTemp.catalog 53.8 (30.05.2013)
+## codeset 4
+## language finnish
+;
+MSG_APPLIB_DESCRIPTION
+Lämpötilan tarkkailu-docky
+; Temperature monitor docky
+;
+MSG_CASE_FORMAT
+Kotelo:  %3ld°%lc
+; Case:  %3ld°%lc
+;
+MSG_CPU_FORMAT
+CPU:  %3ld°%lc
+; CPU:   %3ld°%lc
+;
+MSG_CORE1_FORMAT
+Ydin1:  %3ld°%lc
+; Core1: %3ld°%lc
+;
+MSG_CORE2_FORMAT
+Ydin2:  %3ld°%lc
+; Core2: %3ld°%lc
+;
+MSG_RINGHIO_TITLE
+X1KTemp - Lämpötilavaroitus
+; X1KTemp - Temperature Warning
+;
+MSG_RINGHIO_CASE_LABEL
+Kotelo
+; Case
+;
+MSG_RINGHIO_CPU_LABEL
+CPU
+; CPU
+;
+MSG_RINGHIO_CORE1_LABEL
+Ydin1
+; Core1
+;
+MSG_RINGHIO_CORE2_LABEL
+Ydin2
+; Core2
+;
+MSG_RINGHIO_BODY_FORMAT
+%s: lämpötila ylitti %ld°%lc. Tuplaklikkaa tätä viestiä, jos haluat estää tämän sensorin varoitukset jatkossa, 
+; %s temperature passed above %ld°%lc. Double-click this message to deactivate further notifications from this sensor.
+;
+MSG_RINGHIO_BODY_CRITICAL
+Lämpötila ylitti kriittisen pisteen. Järjestelmä sammutetaan 4 sekunnin kuluttua. Tuplaklikkaa tätä viestiä keskeyttääksesi.
+; Temperature reached a critical point. System will shutdown in 4 seconds. Double-click this message to abort.
+;

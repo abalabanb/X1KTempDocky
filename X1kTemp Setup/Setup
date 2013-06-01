@@ -454,7 +454,7 @@
 
 ; configure
 
-(set #app-version               "53.8")
+(set #app-version               "53.9")
 (set @app-name                  (cat "X1kTemp Docky " @app-version))
 (set @name                      (cat "X1kTemp Docky " @app-version))
 (set @short                     "X1kTemp.docky")
@@ -850,6 +850,16 @@
 
                 (source "Catalogs/italian/X1kTemp.catalog")
                 (dest "locale:catalogs/italian/")
+                (nogauge)
+                (optional "nofail" "force" "askuser")
+            )
+        )
+        (if (or (= @language "finnish"))
+
+            (copyfiles
+
+                (source "Catalogs/finnish/X1kTemp.catalog")
+                (dest "locale:catalogs/finnish/")
                 (nogauge)
                 (optional "nofail" "force" "askuser")
             )

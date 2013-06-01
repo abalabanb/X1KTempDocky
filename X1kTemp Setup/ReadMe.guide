@@ -223,6 +223,8 @@ Future development of this docky involves:
                             translations (Samo79)
                     - (FIX) Typo in French translation for Core2 (zzd10h)
                     - (ADD) Updated translations
+- 53.9, XX/XX/2013: - (ADD) Finish localization by Marko 'blmara' Raina
+                    - (FIX) Removed debug trace left (blmara)
 
 @endnode
 @node CONTACT "Contact Me"
@@ -253,8 +255,9 @@ to contact me.
   keeping the boing ball rolling.
 * Thanks to A-Eon Technology and Varisys for this fantastic machine that
   is the AmigaOne X1000.
-* Thanks Anthony 'Phantom' Iliakis for Greek translations and Thomas
-  'TommySammy' Blatt for German ones.
+* Thanks Anthony 'Phantom' Iliakis for Greek translations, Thomas
+  'TommySammy' Blatt for German ones, Samir 'Samo79' Hawamdeh for the
+  Italian ones and Marko 'blmara' Raina for the finnish ones.
 
 @endnode
 

@@ -31,7 +31,7 @@ VERSION = 53
 
 SRCS = init.c docky.c cfg.c readtemp.c locale_support.c
 
-CTS = X1kTemp_fr.ct X1kTemp_de.ct X1kTemp_gr.ct X1kTemp_it.ct
+CTS = X1kTemp_fr.ct X1kTemp_de.ct X1kTemp_gr.ct X1kTemp_it.ct X1kTemp_fi.ct
 
 # -------------------------------------------------------------
 # Nothing should need changing below this line
