@@ -43,7 +43,9 @@ void OpenLocaleCatalog (struct DockyData* dd, const char *catalog) {
 	}
 	dd->CodeSet = dd->Catalog ? dd->Catalog->cat_CodeSet : 4;
 
+#ifndef NDEBUG
     IExec->DebugPrintF("[OpenLocaleCatalog] ILocale='%08x', ddCatalog='%08x'\n", ILocale, dd->Catalog);
+#endif
 }
 
 void CloseLocaleCatalog (struct DockyData* dd) {
