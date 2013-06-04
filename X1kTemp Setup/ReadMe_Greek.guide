@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.8 (12.05.13)
+@$VER: ReadMe Guide 53.9 (04.06.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-    @{fg shine}X1kTemp Docky v53.8@{fg text}
+    @{fg shine}X1kTemp Docky v53.9@{fg text}
 ---------------------------
 @{i}Μια εφαρμογή επιτήρησης θερμοκρασίας για την AmigaOne X1000.@{ui}
 
@@ -239,6 +239,14 @@ Ringhio, αλλιώς εκτελείται η εντολή ειδοποίησης.
                     - (ΔΙΟΡΘΩΣΗ) Τυπογραφικό λάθος για την γαλλική μετάφραση του Πυρήνα2 (zzd10h)
                     - (ΠΡΟΣΘΗΚΗ) Ενημερωμένες μεταφράσεις
 
+- 53.9, 05/06/2013: - (ΠΡΟΣΘΗΚΗ) Φινλανδική μετάφραση από τον Marko 'blmara' Raina
+                    - (ΔΙΟΡΘΩΣΗ) Αφαίρεση υπολοιπόμενων εντοπισμού σφαλμάτων (blmara)
+                    - (ΔΙΟΡΘΩΣΗ) Το X1kTemp είναι καταχωρημένο με το REGAPP_NoIcon, έτσι η εφαρμογή γραμμής
+                                 εργασιών δεν θα εμφανίζεται (blmara)
+                    - (FIX) In Fahrenheit scale X1kTemp will falsely detect
+                            critical temperature and power off (Justin Webb)
+
+
 @endnode
 @node CONTACT "Contact Me"
 @{fg shine}Επικοινωνία@{fg text}
@@ -269,7 +277,9 @@ Ringhio, αλλιώς εκτελείται η εντολή ειδοποίησης.
 * Ευχαριστίες στην A-EON Technology και Varisys για αυτό το φανταστικό μηχάνημα, που
   φυσικά είναι η AmigaOne X1000.
 * Ευχαριστούμε τον Αντώνη 'Phantom' Ηλιάκη για την ελληνική μετάφραση και επίσης τον Thomas
-  'TommySammy' Blatt για την γερμανική.
+  'TommySammy' Blatt για την γερμανική. Επίσης τον Samir 'Samo79' Hawamdeh για την ιταλική
+  μετάφραση και τον Marko 'blmara' Raina για την φινλανδική.
+
 
 @endnode
 

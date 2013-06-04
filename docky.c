@@ -40,8 +40,8 @@
 #define MAX_STRING_SIZE 12
 #define DEFAULT_TIMESPAN 300
 
-#define MB_CRITICAL     dd->bUseFahrenheit?113:45
-#define CPU_CRITICAL    dd->bUseFahrenheit?185:85
+#define MB_CRITICAL     (dd->bUseFahrenheit?113:45)
+#define CPU_CRITICAL    (dd->bUseFahrenheit?185:85)
 #define CRITICAL_TIMESPAN 180
 #define ABORT_SHUTDOWN  "ABORT_SHUTDOWN"
 
@@ -105,8 +105,9 @@ uint32 DockyObtain (struct DockyIFace *Self) {
 
     OpenLocaleCatalog(dd, "X1kTemp.catalog");
     dd->nAppID = IApplication->RegisterApplication("X1kTemp",
-            REGAPP_URLIdentifier, "balaban.fr",
-            REGAPP_Description,  GetString(dd, MSG_APPLIB_DESCRIPTION) ,
+            REGAPP_URLIdentifier,   "balaban.fr",
+            REGAPP_Description,     GetString(dd, MSG_APPLIB_DESCRIPTION),
+            REGAPP_NoIcon,          TRUE,
             TAG_DONE);
 
 #ifndef NDEBUG
@@ -649,6 +650,9 @@ static void CheckCriticalTemperatures(struct DockyData *dd, uint16 nMB, uint16 n
     {
         struct DockyBase * db = dd->Base;
 
+#ifndef NDEBUG
+    	IExec->DebugPrintF("[CheckCriticalTemperatures] %ld <= %ld || %ld <= %ld || %ld <= %ld\n", MB_CRITICAL, nMB, CPU_CRITICAL, nCore1, CPU_CRITICAL, nCore2);
+#endif
         struct DateStamp dsNow = {0};
         IDOS->DateStamp(&dsNow);
         uint32 nNow = IDOS->DateStampToSeconds(&dsNow);

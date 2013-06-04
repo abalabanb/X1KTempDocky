@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.8 (16.05.13)
+@$VER: ReadMe Guide 53.9 (04.06.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-      @{fg shine}X1kTemp Docky v53.8@{fg text}
+      @{fg shine}X1kTemp Docky v53.9@{fg text}
 -------------------------------
 @{i}  Un docky de surveillance de
 température pour AmigaOne X1000@{ui}
@@ -231,6 +231,12 @@ Le développement futur de ce docky inclut :
                             translations (Samo79)
                     - (FIX) Typo in French translation for Core2 (zzd10h)
                     - (ADD) Updated translations
+- 53.9, 05/06/2013: - (ADD) Finish localization by Marko 'blmara' Raina
+                    - (FIX) Removed debug trace left (blmara)
+                    - (FIX) X1kTemp now register with REGAPP_NoIcon so task
+                            bar application won't show it (blmara)
+                    - (FIX) In Fahrenheit scale X1kTemp will falsely detect
+                            critical temperature and power off (Justin Webb)
 
 @endnode
 @node CONTACT "Contact"
@@ -262,8 +268,9 @@ pas à m'écrire.
   continuer à faire tourner la boing balle.
 * Merci à A-Eon Technology et à Varisys pour cette fantastique machine qu'est
   l'AmigaOne X1000.
-* Merci à Anthony 'Phantom' Iliakis pour ses traductions Grecques et à Thomas
-  'TommySammy' Blatt pour les Allemandes.
+* Merci à Anthony 'Phantom' Iliakis pour ses traductions Grecques, à Thomas
+  'TommySammy' Blatt pour les Allemandes, à Samir 'Samo79' Hawamdeh pour les
+  Italiennes et à Marko 'blmara' Raina pour les Finlandaises.
 
 
 @endnode
