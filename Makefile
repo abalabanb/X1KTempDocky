@@ -56,6 +56,13 @@ locale.h: X1kTemp.cd
 clean:
 	$(RM) $(TARGET) $(OBJS)
 
+.PHONY: release
+release:
+	Copy "X1kTemp Setup/" T:X1kTemp CLONE ALL FOLLOWLINKS COPYLINKS
+	Copy "X1kTemp Setup.info" T:X1kTemp.info
+	Delete t:X1kTemp/.svn all
+	Rename t:X1kTemp/AutoInstall T:
+
 .PHONY: distclean
 distclean:
 	$(RM) $(OBJS)
