@@ -237,6 +237,11 @@ Le développement futur de ce docky inclut :
                             bar application won't show it (blmara)
                     - (FIX) In Fahrenheit scale X1kTemp will falsely detect
                             critical temperature and power off (Justin Webb)
+                    - (ADD) Autoinstall copies appropriate catalogs in LOCALE:
+                    - (FIX) Autoinstall will install icon loosing configured
+                            tooltypes
+                    - (FIX) Autoinstall installs uneeded installation support
+                            files
 
 @endnode
 @node CONTACT "Contact"
