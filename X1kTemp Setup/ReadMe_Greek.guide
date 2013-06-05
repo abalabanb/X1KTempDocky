@@ -1,10 +1,10 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.9 (04.06.13)
+@$VER: ReadMe Guide 53.10 (04.06.13)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
-    @{fg shine}X1kTemp Docky v53.9@{fg text}
+    @{fg shine}X1kTemp Docky v53.10@{fg text}
 ---------------------------
 @{i}Μια εφαρμογή επιτήρησης θερμοκρασίας για την AmigaOne X1000.@{ui}
 
