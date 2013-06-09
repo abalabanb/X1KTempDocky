@@ -43,7 +43,10 @@ CATALOGS = $(CTS:.ct=.catalog)
 # Rules for building
 all: $(TARGET) $(CATALOGS)
 
-$(TARGET): $(OBJS)
+$(TARGET): $(TARGET).debug
+	strip $(TARGET).debug -o $(TARGET)
+
+$(TARGET).debug: $(OBJS)
 	$(CC) $(LINK) -nostdlib -o $(TARGET) $(OBJS) $(LIBS)
 
 locale.h: X1kTemp.cd
