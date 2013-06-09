@@ -4,7 +4,7 @@
 Set X1kTemp.docky `GetEnv AppPaths/X1kTemp.docky`
 
 ; now copy everything in the archive (apart from the executable)
-Copy "X1kTemp Setup/~(X1kTemp.docky(|.info)|Setup#?|installwizard|#?.rexx)" "$X1kTemp.docky" ALL CLONE QUIET
+Copy "X1kTemp/~(X1kTemp.docky(|.info)|Setup#?|installwizard|#?.rexx)" "$X1kTemp.docky" ALL CLONE QUIET
 
 ; copy and store a backup of the executable for Rollback
 CopyStore X1kTemp/X1kTemp.docky "$X1kTemp.docky"
