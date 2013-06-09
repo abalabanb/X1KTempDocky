@@ -59,8 +59,9 @@ clean:
 .PHONY: release
 release:
 	Copy "X1kTemp Setup/" T:X1kTemp CLONE ALL FOLLOWLINKS COPYLINKS
+	Copy Catalogs T:X1kTemp/Catalogs CLONE ALL FOLLOWLINKS COPYLINKS
 	Copy "X1kTemp Setup.info" T:X1kTemp.info
-	Delete t:X1kTemp/.svn all
+	Delete t:X1kTemp/.svn t:X1KTemp/installwizard/.svn t:X1KTemp/installwizard/programs/.svn all
 	Rename t:X1kTemp/AutoInstall T:
 
 .PHONY: distclean
