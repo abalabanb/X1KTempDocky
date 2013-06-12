@@ -44,10 +44,10 @@ CATALOGS = $(CTS:.ct=.catalog)
 all: $(TARGET) $(CATALOGS)
 
 $(TARGET): $(TARGET).debug
-	strip $(TARGET).debug -o $(TARGET)
+	strip $(TARGET).debug -o $@
 
 $(TARGET).debug: $(OBJS)
-	$(CC) $(LINK) -nostdlib -o $(TARGET) $(OBJS) $(LIBS)
+	$(CC) $(LINK) -nostdlib -o $@ $(OBJS) $(LIBS)
 
 locale.h: X1kTemp.cd
 	Catcomp $^ CFILE $@ NOCODE
