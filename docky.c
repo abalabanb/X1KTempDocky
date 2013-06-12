@@ -53,7 +53,7 @@ extern const struct TagItem dockyTags[];
 static void DockyRender (struct DockyBase *db, struct DockyData *dd);
 static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, uint32 *pLastNotified, CONST_STRPTR szSensor);
 static void CheckCriticalTemperatures(struct DockyData *dd, uint16 nMB, uint16 nCore1, uint16 nCore2);
-static void Sync(void);
+static void Sync(struct DockyData *dd);
 static void TogglePowerOff(BOOL bActivate);
 
 uint32 strlen(CONST_STRPTR str)
@@ -682,7 +682,7 @@ static void CheckCriticalTemperatures(struct DockyData *dd, uint16 nMB, uint16 n
     #ifndef NDEBUG
             	IExec->DebugPrintF("[CheckCriticalTemperatures] notify returned %ld\n", result);
     #endif
-                if(dd->bSyncBeforePowerOff) Sync();
+                if(dd->bSyncBeforePowerOff) Sync(dd);
                 TogglePowerOff(TRUE);
             }
             dd->nCriticalLastNotified = nNow;
@@ -692,10 +692,12 @@ static void CheckCriticalTemperatures(struct DockyData *dd, uint16 nMB, uint16 n
 ///
 
 /// Sync
-static void Sync(void)
+static void Sync(struct DockyData *dd)
 {
     const uint32 flags = LDF_READ|LDF_DEVICES;
     struct DeviceNode *dn;
+
+    struct DockyBase * db = dd->Base;
 
     dn = (struct DeviceNode*)IDOS->LockDosList(flags);
     while ((dn = (struct DeviceNode *)IDOS->NextDosEntry((struct DosList *)dn, flags)))
@@ -703,7 +705,7 @@ static void Sync(void)
         if (dn->dn_Port != NULL)
     	{
             /* Skip RAM Disk */
-            if (!ILocale->Strncmp((char *)BADDR(dn->dn_Name)+1, "RAM", 3))
+            if (!IUtility->Strnicmp((char *)BADDR(dn->dn_Name)+1, "RAM", 3))
                 continue;
 
             /* Cause filesystem to flush all pending writes. */
