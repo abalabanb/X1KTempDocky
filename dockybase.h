@@ -110,6 +110,8 @@ struct DockyData {
 
     BOOL bSetEnv;
     BOOL bUseFahrenheit;
+    BOOL bSyncBeforePowerOff;
+    BOOL bNoCriticalCheck;
 
     tmp423_device_t dev;
 

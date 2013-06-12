@@ -80,6 +80,7 @@ X1kTemp Docky has the following features:
   be notified again,
 - ability to launch a configurable command line or to power off the AmigaOne
   X1000 when critical temperature is reached,
+- the software poweroff can be synchrone in order to avoid data losses,
 - localized messages.
 
 
@@ -154,6 +155,11 @@ tooltypes are available:
 - CRITICAL_CMD (STRING): command to execute when critical temperature is
   reached. By default it will engage a software power off which can be
   aborted by double-clicking the Ringhio notification.
+- CRITICAL_CHECK (ON|OFF): activate or deactivate the critical temperatures
+  checks. By default critical temperatures are checked.
+- SYNC_POWEROFF (ON|OFF): activate or deactivate the sync feature so that
+  X1kTemp.docky will try to inhibit all partitions before launching the
+  power off procedure. By default sync feature is disabled.
 
 Note that after each tooltype the datatype or allowed values are listed
 between parenthesis.
@@ -234,6 +240,10 @@ Future development of this docky involves:
                             tooltypes
                     - (FIX) Autoinstall installs uneeded installation support
                             files
+- 53.10, xx/06/2013:- (ADD) Sync before power off feature
+                    - (ADD) Tooltype 'SYNC_POWEROFF' to control sync
+                    - (ADD) Tooltype 'CRITICAL_CHECK' to deactivate the critical
+                            temperatures checks
 
 
 @endnode

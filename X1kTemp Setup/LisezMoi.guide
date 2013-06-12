@@ -85,6 +85,8 @@ Le Docky X1kTemp dipose des fonctionnalités suivantes :
   ne seront plus notifiés,
 - possibilité d'exécuter une ligne de commande configurable ou d'éteindre
   l'AmigaOne X1000 lorsque les températures critiques sont atteintes,
+- l'extinction logicielle peut se faire de manière synchronisée pour éviter
+  les pertes de données,
 - messages localisés.
 
 Les notifications sont émises lorsque le docky détecte que la température
@@ -161,6 +163,11 @@ icône. Les types d'outil suivants sont disponibles :
 - CRITICAL_CMD (CHAINE): commande à exécuter lorsque l'une des températures
   critique est atteinte. Par défaut cela engage un arrêt logiciel qui peut être
   annulé en double-cliquant sur la notification Ringhio.
+- CRITICAL_CHECK (ON|OFF): active ou désactive la vérification des températures
+  critiques. Par défaut les températures critiques sont vérifiées.
+- SYNC_POWEROFF (ON|OFF): active ou désactive la fonction de synchronisation
+  faisant que X1kTemp.docky va tenter d'inhiber toutes les partitions avant de
+  démarrer la procédure d'arrêt logiciel. Par défaut la fonction est désactivée.
 
 Veuillez noter qu'après chaque type d'outil le type de données ou la liste des
 valeurs autorisées est indiqué entre parenthèses.
@@ -242,6 +249,10 @@ Le développement futur de ce docky inclut :
                             tooltypes
                     - (FIX) Autoinstall installs uneeded installation support
                             files
+- 53.10, xx/06/2013:- (ADD) Sync before power off feature
+                    - (ADD) Tooltype 'SYNC_POWEROFF' to control sync
+                    - (ADD) Tooltype 'CRITICAL_CHECK' to deactivate the critical
+                            temperatures checks
 
 @endnode
 @node CONTACT "Contact"

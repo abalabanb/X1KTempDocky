@@ -53,6 +53,7 @@ extern const struct TagItem dockyTags[];
 static void DockyRender (struct DockyBase *db, struct DockyData *dd);
 static void CheckWarnTemperatures(struct DockyData *dd, uint16 nTempThreshold, uint16 nTempValue, uint32 *pLastNotified, CONST_STRPTR szSensor);
 static void CheckCriticalTemperatures(struct DockyData *dd, uint16 nMB, uint16 nCore1, uint16 nCore2);
+static void Sync(void);
 static void TogglePowerOff(BOOL bActivate);
 
 uint32 strlen(CONST_STRPTR str)
@@ -197,7 +198,7 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
 
 	dd->font = GfxLib->DefaultFont;
 
-    dd->bSetEnv = FALSE;
+    dd->bSetEnv = dd->bUseFahrenheit = dd->bSyncBeforePowerOff = dd->bNoCriticalCheck = FALSE;
     dd->szWarnCmd[0] = '\0' ;
     dd->szCriticalCmd[0] = '\0';
     IApplication->GetApplicationAttrs(dd->nAppID, APPATTR_Port, &dd->pAppLibPort, TAG_DONE);
@@ -251,6 +252,8 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
         dd->refreshRate = CFGInteger(icon, "REFRESH", 50);
         dd->bSetEnv = CFGBoolean(icon, "SETENV");
         dd->bUseFahrenheit = CFGBoolean(icon, "FAHRENHEIT");
+        dd->bNoCriticalCheck = !CFGBoolean(icon, "CRITICAL_CHECK");
+        dd->bSyncBeforePowerOff = CFGBoolean(icon, "SYNC_POWEROFF");
         dd->MBWarnTemp = CFGInteger(icon, "LOCAL_WARN", ~0);
         dd->CPUWarnTemp = CFGInteger(icon, "CPU_WARN", ~0);
         dd->Core1WarnTemp = CFGInteger(icon, "CORE1_WARN", ~0);
@@ -461,7 +464,8 @@ BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, u
     uint8 nCorIdx = dd->curIdx?dd->curIdx-1:dd->maxIdx-1;
 
     // check critical temperatures
-    CheckCriticalTemperatures(dd, dd->MBTemp[nCorIdx], dd->Core1Temp[nCorIdx],  dd->Core2Temp[nCorIdx]);
+    if(!dd->bNoCriticalCheck)
+        CheckCriticalTemperatures(dd, dd->MBTemp[nCorIdx], dd->Core1Temp[nCorIdx], dd->Core2Temp[nCorIdx]);
 
     // check warning temperatures
     CheckWarnTemperatures(dd, dd->MBWarnTemp, dd->MBTemp[nCorIdx],  &dd->nMBLastWarned, GetString(dd, MSG_RINGHIO_CASE_LABEL) );
@@ -678,11 +682,40 @@ static void CheckCriticalTemperatures(struct DockyData *dd, uint16 nMB, uint16 n
     #ifndef NDEBUG
             	IExec->DebugPrintF("[CheckCriticalTemperatures] notify returned %ld\n", result);
     #endif
+                if(dd->bSyncBeforePowerOff) Sync();
                 TogglePowerOff(TRUE);
             }
             dd->nCriticalLastNotified = nNow;
         }
     }
+}
+///
+
+/// Sync
+static void Sync(void)
+{
+    const uint32 flags = LDF_READ|LDF_DEVICES;
+    struct DeviceNode *dn;
+
+    dn = (struct DeviceNode*)IDOS->LockDosList(flags);
+    while ((dn = (struct DeviceNode *)IDOS->NextDosEntry((struct DosList *)dn, flags)))
+	{
+        if (dn->dn_Port != NULL)
+    	{
+            /* Skip RAM Disk */
+            if (!ILocale->Strncmp((char *)BADDR(dn->dn_Name)+1, "RAM", 3))
+                continue;
+
+            /* Cause filesystem to flush all pending writes. */
+            /* Inhibit should do this as well but might be useful for old
+               filesystems that don't support inhibit? */
+            IDOS->FlushVolumePort(dn->dn_Port); /* Requires dos.library V53.90 */
+
+            /* Inhibit filesystem. */
+            IDOS->InhibitPort(dn->dn_Port, TRUE); /* Requires dos.library V53.88 */
+        }
+    }
+    IDOS->UnLockDosList(flags);
 }
 ///
 
