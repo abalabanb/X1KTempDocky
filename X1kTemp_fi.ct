@@ -1,4 +1,4 @@
-## version $VER: X1kTemp.catalog 53.8 (30.05.2013)
+## version $VER: X1kTemp.catalog 53.8 (17.06.2013)
 ## codeset 4
 ## language finnish
 ;
@@ -7,19 +7,19 @@ Lämpötilan tarkkailu-docky
 ; Temperature monitor docky
 ;
 MSG_CASE_FORMAT
-Kotelo:  %3ld°%lc
+Kotelo:%3ld°%lc
 ; Case:  %3ld°%lc
 ;
 MSG_CPU_FORMAT
-CPU:  %3ld°%lc
+CPU:   %3ld°%lc
 ; CPU:   %3ld°%lc
 ;
 MSG_CORE1_FORMAT
-Ydin1:  %3ld°%lc
+Ydin1: %3ld°%lc
 ; Core1: %3ld°%lc
 ;
 MSG_CORE2_FORMAT
-Ydin2:  %3ld°%lc
+Ydin2: %3ld°%lc
 ; Core2: %3ld°%lc
 ;
 MSG_RINGHIO_TITLE
@@ -43,7 +43,7 @@ Ydin2
 ; Core2
 ;
 MSG_RINGHIO_BODY_FORMAT
-%s: lämpötila ylitti %ld°%lc. Tuplaklikkaa tätä viestiä, jos haluat estää tämän sensorin varoitukset jatkossa, 
+%s: lämpötila ylitti %ld°%lc. Tuplaklikkaa tätä viestiä, jos haluat estää tämän sensorin varoitukset jatkossa.
 ; %s temperature passed above %ld°%lc. Double-click this message to deactivate further notifications from this sensor.
 ;
 MSG_RINGHIO_BODY_CRITICAL
