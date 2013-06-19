@@ -244,6 +244,8 @@ Future development of this docky involves:
                     - (ADD) Tooltype 'SYNC_POWEROFF' to control sync
                     - (ADD) Tooltype 'CRITICAL_CHECK' to deactivate the critical
                             temperatures checks
+                    - (UPD) Finnish translation (blmara)
+                    - (FIX) CRITICAL_CMD tooltype was not taken into account
 
 
 @endnode

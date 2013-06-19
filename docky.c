@@ -262,6 +262,10 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
         STRPTR szTmp = CFGString(icon, "WARN_CMD", NULL);
         if(szTmp)
             IUtility->Strlcpy(dd->szWarnCmd, szTmp, 2048);
+        szTmp = CFGString(icon, "CRITICAL_CMD", NULL);
+        if(szTmp)
+            IUtility->Strlcpy(dd->szCriticalCmd, szTmp, 2048);
+
 
 		IIcon->FreeDiskObject(icon);
 	}
