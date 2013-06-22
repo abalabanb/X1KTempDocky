@@ -81,6 +81,7 @@ X1kTemp Docky has the following features:
 - ability to launch a configurable command line or to power off the AmigaOne
   X1000 when critical temperature is reached,
 - the software poweroff can be synchrone in order to avoid data losses,
+- ability to choose chich of the four sensors are displayed,
 - localized messages.
 
 
@@ -160,6 +161,10 @@ tooltypes are available:
 - SYNC_POWEROFF (ON|OFF): activate or deactivate the sync feature so that
   X1kTemp.docky will try to inhibit all partitions before launching the
   power off procedure. By default sync feature is disabled.
+- HIDE_LOCAL (ON|OFF): hides the local sensor display. By default displayed.
+- HIDE_CPU (ON|OFF): hides the CPU sensor display. By default displayed.
+- HIDE_CORE1 (ON|OFF): hides the Core1 sensor display. By default displayed.
+- HIDE_CORE2 (ON|OFF): hides the Core2 sensor display. By default displayed.
 
 Note that after each tooltype the datatype or allowed values are listed
 between parenthesis.
@@ -246,6 +251,7 @@ Future development of this docky involves:
                             temperatures checks
                     - (UPD) Finnish translation (blmara)
                     - (FIX) CRITICAL_CMD tooltype was not taken into account
+                    - (ADD) Ability to choose which sensor to display
 
 
 @endnode

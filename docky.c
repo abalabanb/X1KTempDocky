@@ -163,14 +163,6 @@ struct DockyIFace *DockyClone (struct DockyIFace *Self) {
 		dd->font = GfxLib->DefaultFont;
 		dd->size.width = dd->font->tf_XSize * (MAX_STRING_SIZE + 2);
         dd->size.height = dd->font->tf_YSize * 4 + 8;
-		dd->MBPos.x = dd->font->tf_XSize*1;
-		dd->MBPos.y = 2+dd->font->tf_Baseline;
-		dd->CPUPos.x = dd->font->tf_XSize*1;
-		dd->CPUPos.y = 4+dd->font->tf_YSize+dd->font->tf_Baseline;
-        dd->Core1Pos.x = dd->font->tf_XSize*1;
-        dd->Core1Pos.y = 6 + dd->font->tf_YSize * 2 + dd->font->tf_Baseline;
-        dd->Core2Pos.x = dd->font->tf_XSize*1;
-        dd->Core2Pos.y = 8 + dd->font->tf_YSize * 3 + dd->font->tf_Baseline;
 		
         dd->curIdx = 0;
         dd->maxIdx = min(MAX_RECORD_LENGTH, dd->size.width);
@@ -195,6 +187,8 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
     dd->MBWarnTemp = dd->CPUWarnTemp = dd-> Core1WarnTemp = dd->Core2WarnTemp = ~0;
     dd->nMBLastWarned = dd->nCPULastWarned = dd->nCore1LastWarned = dd->nCore2LastWarned = dd->nCriticalLastNotified = 0;
     dd->nWarnTimespan = DEFAULT_TIMESPAN;
+
+    dd->bfDisplay = displayAll;
 
 	dd->font = GfxLib->DefaultFont;
 
@@ -265,21 +259,17 @@ static void ReadDockyPrefs (struct DockyBase *db, struct DockyData *dd, char *fi
         szTmp = CFGString(icon, "CRITICAL_CMD", NULL);
         if(szTmp)
             IUtility->Strlcpy(dd->szCriticalCmd, szTmp, 2048);
-
+        dd->bfDisplay = CFGBoolean(icon, "HIDE_LOCAL")?0:displayMB;
+        dd->bfDisplay |= CFGBoolean(icon, "HIDE_CPU")?0:displayCPU;
+        dd->bfDisplay |= CFGBoolean(icon, "HIDE_CORE1")?0:displayCore1;
+        dd->bfDisplay |= CFGBoolean(icon, "HIDE_CORE2")?0:displayCore2;
 
 		IIcon->FreeDiskObject(icon);
 	}
 
 	dd->size.width = dd->font->tf_XSize * (MAX_STRING_SIZE + 2);
-    dd->size.height = dd->font->tf_YSize * 4 + 8;
-	dd->MBPos.x = dd->font->tf_XSize*1;
-	dd->MBPos.y = 2+dd->font->tf_Baseline;
-	dd->CPUPos.x = dd->font->tf_XSize*1;
-	dd->CPUPos.y = 4+dd->font->tf_YSize+dd->font->tf_Baseline;
-    dd->Core1Pos.x = dd->font->tf_XSize*1;
-    dd->Core1Pos.y = 6 + dd->font->tf_YSize * 2 + dd->font->tf_Baseline;
-    dd->Core2Pos.x = dd->font->tf_XSize*1;
-    dd->Core2Pos.y = 8 + dd->font->tf_YSize * 3 + dd->font->tf_Baseline;
+    int nLineNo = (dd->bfDisplay&displayMB) + ((dd->bfDisplay&displayCPU)?1:0) + ((dd->bfDisplay&displayCore1)?1:0) + ((dd->bfDisplay&displayCore2)?1:0);
+    dd->size.height = dd->font->tf_YSize * nLineNo + nLineNo * 2;
 
     dd->curIdx = 0;
     dd->maxIdx = min(MAX_RECORD_LENGTH, dd->size.width);
@@ -529,10 +519,15 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
 
         uint8 nIdx = 0, nCorIdx = 0;
         uint16 nTemp = 0;
-        struct IBox iBoxCPU = {0, dd->CPUPos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+3},
-                    iBoxMB = {0, dd->MBPos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2},
-                    iBoxCore1 = {0, dd->Core1Pos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+3},
-                    iBoxCore2 = {0, dd->Core2Pos.y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2};
+        struct Pos rgPos[4] = { {dd->font->tf_XSize*1, 2 + dd->font->tf_Baseline},
+                                {dd->font->tf_XSize*1, 4 + dd->font->tf_YSize+dd->font->tf_Baseline},
+                                {dd->font->tf_XSize*1, 6 + dd->font->tf_YSize * 2 + dd->font->tf_Baseline},
+                                {dd->font->tf_XSize*1, 8 + dd->font->tf_YSize * 3 + dd->font->tf_Baseline} };
+
+        struct IBox rgBox[4] = {{0, rgPos[0].y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+3},
+                                {0, rgPos[1].y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2},
+                                {0, rgPos[2].y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+3},
+                                {0, rgPos[3].y-dd->font->tf_YSize, dd->size.width, dd->font->tf_YSize+2}};
 		uint16 nDivider = dd->bUseFahrenheit?212:100;
 
         if(dd->backpen != (uint16)~0)
@@ -541,63 +536,100 @@ static void DockyRender (struct DockyBase *db, struct DockyData *dd) {
             IGraphics->RectFill(dd->rp, 0, 0, dd->size.width, dd->size.height);
         }
 
+        uint8 nLineNo = 0;
         for(nIdx = 0; nIdx < dd->maxIdx; nIdx++)
         {
             nCorIdx = (dd->curIdx+nIdx)%(dd->maxIdx);
+            nLineNo = 0;
 
-            nTemp = dd->MBTemp[nCorIdx] * dd->font->tf_YSize / nDivider;
-            if(0 != nTemp)
-    		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->MBPos.y-nTemp,
-                                        1, nTemp+3, &iBoxMB, 0L, &dd->GradSpecGraph, dd->dri);
+            if(dd->bfDisplay & displayMB)
+            {
+                nTemp = dd->MBTemp[nCorIdx] * dd->font->tf_YSize / nDivider;
+                if(0 != nTemp)
+         		    IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, rgPos[nLineNo].y-nTemp,
+                                            1, nTemp+3, &rgBox[nLineNo], 0L, &dd->GradSpecGraph, dd->dri);
+                nLineNo++;
+            }
 
-            nTemp = dd->CPUTemp[nCorIdx] * dd->font->tf_YSize / nDivider;
-            if(0 != nTemp)
-    		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->CPUPos.y-nTemp,
-                                        1, nTemp+3, &iBoxCPU, 0L, &dd->GradSpecGraph, dd->dri);
-            nTemp = dd->Core1Temp[nCorIdx] * dd->font->tf_YSize / nDivider;
-            if(0 != nTemp)
-    		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->Core1Pos.y-nTemp,
-                                        1, nTemp+3, &iBoxCore1, 0L, &dd->GradSpecGraph, dd->dri);
-            nTemp = dd->Core2Temp[nCorIdx] * dd->font->tf_YSize / nDivider;
-            if(0 != nTemp)
-    		   IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, dd->Core2Pos.y-nTemp,
-                                        1, nTemp+3, &iBoxCore2, 0L, &dd->GradSpecGraph, dd->dri);
+            if(dd->bfDisplay & displayCPU)
+            {
+                nTemp = dd->CPUTemp[nCorIdx] * dd->font->tf_YSize / nDivider;
+                if(0 != nTemp)
+         		    IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, rgPos[nLineNo].y-nTemp,
+                                            1, nTemp+3, &rgBox[nLineNo], 0L, &dd->GradSpecGraph, dd->dri);
+                nLineNo++;
+            }
+
+            if(dd->bfDisplay & displayCore1)
+            {
+                nTemp = dd->Core1Temp[nCorIdx] * dd->font->tf_YSize / nDivider;
+                if(0 != nTemp)
+         		    IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, rgPos[nLineNo].y-nTemp,
+                                            1, nTemp+3, &rgBox[nLineNo], 0L, &dd->GradSpecGraph, dd->dri);
+                nLineNo++;
+            }
+
+            if(dd->bfDisplay & displayCore2)
+            {
+                nTemp = dd->Core2Temp[nCorIdx] * dd->font->tf_YSize / nDivider;
+                if(0 != nTemp)
+         		    IIntuition->DrawGradient(dd->rp, dd->font->tf_XSize + nIdx, rgPos[nLineNo].y-nTemp,
+                                            1, nTemp+3, &rgBox[nLineNo], 0L, &dd->GradSpecGraph, dd->dri);
+                nLineNo++;
+            }
         }
 
         TEXT cUnit = dd->bUseFahrenheit?'F':'C';
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CASE_FORMAT) , dd->MBTemp[nCorIdx], cUnit);
+        nLineNo = 0;
 		IGraphics->SetFont(dd->rp, dd->font);
-		IGraphics->Move(dd->rp, dd->MBPos.x+1, dd->MBPos.y+1);
-		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
-		IGraphics->Text(dd->rp, tmp, strlen(tmp));
-		IGraphics->Move(dd->rp, dd->MBPos.x, dd->MBPos.y);
-		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
-		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+        if(dd->bfDisplay & displayMB)
+        {
+            IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CASE_FORMAT) , dd->MBTemp[nCorIdx], cUnit);
+    		IGraphics->Move(dd->rp, rgPos[nLineNo].x+1, rgPos[nLineNo].y+1);
+    		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
+    		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+    		IGraphics->Move(dd->rp, rgPos[nLineNo].x, rgPos[nLineNo].y);
+    		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
+    		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+            nLineNo++;
+        }
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CPU_FORMAT) , dd->CPUTemp[nCorIdx], cUnit);
-		IGraphics->Move(dd->rp, dd->CPUPos.x+1, dd->CPUPos.y+1);
-		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
-		IGraphics->Text(dd->rp, tmp, strlen(tmp));
-		IGraphics->Move(dd->rp, dd->CPUPos.x, dd->CPUPos.y);
-		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
-		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+        if(dd->bfDisplay & displayCPU)
+        {
+            IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CPU_FORMAT) , dd->CPUTemp[nCorIdx], cUnit);
+    		IGraphics->Move(dd->rp, rgPos[nLineNo].x+1, rgPos[nLineNo].y+1);
+    		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
+    		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+    		IGraphics->Move(dd->rp, rgPos[nLineNo].x, rgPos[nLineNo].y);
+    		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
+    		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+            nLineNo++;
+        }
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CORE1_FORMAT) , dd->Core1Temp[nCorIdx], cUnit);
-		IGraphics->Move(dd->rp, dd->Core1Pos.x+1, dd->Core1Pos.y+1);
-		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
-		IGraphics->Text(dd->rp, tmp, strlen(tmp));
-		IGraphics->Move(dd->rp, dd->Core1Pos.x, dd->Core1Pos.y);
-		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
-		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+        if(dd->bfDisplay & displayCore1)
+        {
+            IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CORE1_FORMAT) , dd->Core1Temp[nCorIdx], cUnit);
+    		IGraphics->Move(dd->rp, rgPos[nLineNo].x+1, rgPos[nLineNo].y+1);
+    		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
+    		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+    		IGraphics->Move(dd->rp, rgPos[nLineNo].x, rgPos[nLineNo].y);
+    		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
+    		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+            nLineNo++;
+        }
 
-        IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CORE2_FORMAT) , dd->Core2Temp[nCorIdx], cUnit);
-		IGraphics->Move(dd->rp, dd->Core2Pos.x+1, dd->Core2Pos.y+1);
-		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
-		IGraphics->Text(dd->rp, tmp, strlen(tmp));
-		IGraphics->Move(dd->rp, dd->Core2Pos.x, dd->Core2Pos.y);
-		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
-		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+        if(dd->bfDisplay & displayCore2)
+        {
+            IUtility->SNPrintf(tmp, MAX_STRING_SIZE+1,  GetString(dd, MSG_CORE2_FORMAT) , dd->Core2Temp[nCorIdx], cUnit);
+    		IGraphics->Move(dd->rp, rgPos[nLineNo].x+1, rgPos[nLineNo].y+1);
+    		IGraphics->SetABPenDrMd(dd->rp, shadowpen, 0, JAM1);
+    		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+    		IGraphics->Move(dd->rp, rgPos[nLineNo].x, rgPos[nLineNo].y);
+    		IGraphics->SetABPenDrMd(dd->rp, textpen, 0, JAM1);
+    		IGraphics->Text(dd->rp, tmp, strlen(tmp));
+            nLineNo++;
+        }
 	}
 }
 ///
