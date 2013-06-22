@@ -151,8 +151,21 @@ STATIC struct Library *libInit(struct DockyBase *db, BPTR seglist, struct Interf
 	IExec = (struct ExecIFace *)exec;
 
 	if (openLibs(db)) {
-        if (smbus_startup(db))
-    		return &db->libNode;
+        ULONG lMachine = MACHINETYPE_UNKNOWN;
+        IExpansion->GetMachineInfoTags(GMIT_Machine,&lMachine,TAG_END);
+        if (MACHINETYPE_X1000 == lMachine)
+        {
+            if (smbus_startup(db))
+        		return &db->libNode;
+        }
+        else
+        {
+            IDOS->TimedDosRequesterTags(TDR_TitleString,    "X1KTemp - Error",
+                                        TDR_FormatString,   "X1KTemp can only operate on AmigaOne X1000.",
+                                        TDR_GadgetString,   "Exit",
+                                        TDR_ImageType,      TDRIMAGE_ERROR,
+                                        TAG_DONE);
+        }
 	}
 	closeLibs(db);
 	return NULL;
@@ -188,24 +201,30 @@ int openLibs (struct DockyBase *db) {
 	if (!ApplicationLib) return FALSE;
 	IApplication = (struct ApplicationIFace *)IExec->GetInterface(ApplicationLib, "application", 1, NULL);
 	if (!IApplication) return FALSE;
+	ExpansionLib = IExec->OpenLibrary("expansion.library", 53);
+    if (!ExpansionLib) return FALSE;
+    IExpansion = (struct ExpansionIFace*)IExec->GetInterface(ExpansionLib, "main", 1, NULL);
+    if (!IExpansion) return FALSE;
 	return TRUE;
 }
 
 void closeLibs (struct DockyBase *db) {
-	IExec->DropInterface((struct Interface *)IDiskfont);
-	IExec->CloseLibrary(DiskfontLib);
-	IExec->DropInterface((struct Interface *)IGraphics);
-	IExec->CloseLibrary((struct Library *)GfxLib);
-	IExec->DropInterface((struct Interface *)IIntuition);
-	IExec->CloseLibrary(IntuitionLib);
-	IExec->DropInterface((struct Interface *)IIcon);
-	IExec->CloseLibrary(IconLib);
-	IExec->DropInterface((struct Interface *)IUtility);
-	IExec->CloseLibrary(UtilityLib);
-	IExec->DropInterface((struct Interface *)IDOS);
-	IExec->CloseLibrary(DOSLib);
-	IExec->DropInterface((struct Interface *)IApplication);
-	IExec->CloseLibrary(ApplicationLib);
+	if(IDiskfont) IExec->DropInterface((struct Interface *)IDiskfont);
+	if(DiskfontLib) IExec->CloseLibrary(DiskfontLib);
+	if(IGraphics) IExec->DropInterface((struct Interface *)IGraphics);
+	if(GfxLib) IExec->CloseLibrary((struct Library *)GfxLib);
+	if(IIntuition) IExec->DropInterface((struct Interface *)IIntuition);
+	if(IntuitionLib) IExec->CloseLibrary(IntuitionLib);
+	if(IIcon) IExec->DropInterface((struct Interface *)IIcon);
+	if(IconLib) IExec->CloseLibrary(IconLib);
+	if(IUtility) IExec->DropInterface((struct Interface *)IUtility);
+	if(UtilityLib) IExec->CloseLibrary(UtilityLib);
+	if(IDOS) IExec->DropInterface((struct Interface *)IDOS);
+	if(DOSLib) IExec->CloseLibrary(DOSLib);
+	if(IApplication) IExec->DropInterface((struct Interface *)IApplication);
+	if(ApplicationLib) IExec->CloseLibrary(ApplicationLib);
+    if(IExpansion) IExec->DropInterface((struct Interface *)IExpansion);
+    if(ExpansionLib) IExec->CloseLibrary(ExpansionLib);
 }
 
 /* ------------------- Manager Interface ------------------------ */

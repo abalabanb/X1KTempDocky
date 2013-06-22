@@ -64,6 +64,15 @@ struct Pos {
 	uint16 x, y;
 };
 
+enum displayBitField {
+    displayMB   = 1<<0,
+    displayCPU  = 1<<1,
+    displayCore1= 1<<2,
+    displayCore2= 1<<3,
+
+    displayAll  = displayMB | displayCPU | displayCore1 | displayCore2,
+};
+
 #define MAX_RECORD_LENGTH 72
 
 typedef uint16 recTmp_t[MAX_RECORD_LENGTH];
@@ -78,7 +87,6 @@ struct DockyData {
 
 	struct Screen *scr;
 	uint16 shadowpen, textpen, backpen;
-	struct Pos MBPos, CPUPos, Core1Pos, Core2Pos;
 
 	BOOL freefont;
 	BOOL blink;
@@ -86,6 +94,9 @@ struct DockyData {
 	uint32 shadowcolor, textcolor, backcolor;
     uint32 graphcolor, graphcolor2;
     struct GradientSpec GradSpecGraph;
+
+    // control display for each sensor
+    uint32 bfDisplay;
 
     // record temperatures as circular buffers
     recTmp_t MBTemp, CPUTemp, Core1Temp, Core2Temp;
@@ -138,6 +149,7 @@ struct DockyBase {
 	struct GraphicsIFace *IGraphics;
 	struct DiskfontIFace *IDiskfont;
     struct PCIIFace *IPCI;
+    struct ExpansionIFace *IExpansion;
     struct TimerIFace *ITimer;
     struct ApplicationIFace *IApplication;
     struct LocaleIFace *ILocale;
@@ -167,6 +179,7 @@ struct DockyBase {
 #define IPCI db->IPCI
 #define IApplication db->IApplication
 #define ILocale db->ILocale
+#define IExpansion db->IExpansion
 
 #define ExecLib db->ExecLib
 #define IntuitionLib db->IntuitionLib

@@ -227,7 +227,6 @@ BOOL smbus_startup(struct DockyBase *db)
 {
     BOOL bStarted = FALSE;
 
-	ExpansionLib = IExec->OpenLibrary("expansion.library", 0);
 	IPCI = (struct PCIIFace *)IExec->GetInterface(ExpansionLib, "pci", 1, TAG_DONE);
 	
 	int idx = 0;

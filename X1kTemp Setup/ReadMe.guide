@@ -252,6 +252,8 @@ Future development of this docky involves:
                     - (UPD) Finnish translation (blmara)
                     - (FIX) CRITICAL_CMD tooltype was not taken into account
                     - (ADD) Ability to choose which sensor to display
+                    - (ADD) Check running machine and graceful exit if it's not
+                            an AmigaOne X1000
 
 
 @endnode
