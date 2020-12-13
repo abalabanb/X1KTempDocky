@@ -61,7 +61,7 @@ struct DockyData;
 #include "readtemp.h"
 
 struct Pos {
-	uint16 x, y;
+    uint16 x, y;
 };
 
 enum displayBitField {
@@ -79,19 +79,19 @@ typedef uint16 recTmp_t[MAX_RECORD_LENGTH];
 
 struct DockyData {
     struct DockyBase *Base;
-	struct DockyObjectNr self;
-	struct DockySize size;
-	struct RastPort *rp;
-	struct TextFont *font;
+    struct DockyObjectNr self;
+    struct DockySize size;
+    struct RastPort *rp;
+    struct TextFont *font;
     struct DrawInfo *dri;
 
-	struct Screen *scr;
-	uint16 shadowpen, textpen, backpen;
+    struct Screen *scr;
+    uint16 shadowpen, textpen, backpen;
 
-	BOOL freefont;
-	BOOL blink;
+    BOOL freefont;
+    BOOL blink;
 
-	uint32 shadowcolor, textcolor, backcolor;
+    uint32 shadowcolor, textcolor, backcolor;
     uint32 graphcolor, graphcolor2;
     struct GradientSpec GradSpecGraph;
 
@@ -133,7 +133,7 @@ struct DockyData {
 
     // locale part
     struct Catalog     *Catalog;
-	uint32             CodeSet;
+    uint32             CodeSet;
 };
 
 #define DDF_BLINK 1
@@ -144,19 +144,21 @@ struct DockyBase {
 
     BPTR segList;
 
-	struct ExecIFace *IExec;
-	struct IntuitionIFace *IIntuition;
-	struct GraphicsIFace *IGraphics;
-	struct DiskfontIFace *IDiskfont;
+    APTR pMutex;
+
+    struct ExecIFace *IExec;
+    struct IntuitionIFace *IIntuition;
+    struct GraphicsIFace *IGraphics;
+    struct DiskfontIFace *IDiskfont;
     struct PCIIFace *IPCI;
     struct ExpansionIFace *IExpansion;
     struct TimerIFace *ITimer;
     struct ApplicationIFace *IApplication;
     struct LocaleIFace *ILocale;
 
-	struct Library *IntuitionLib;
-	struct GfxBase *GfxLib;
-	struct Library *DiskfontLib;
+    struct Library *IntuitionLib;
+    struct GfxBase *GfxLib;
+    struct Library *DiskfontLib;
     struct Library *ExpansionLib;
     struct Library *ApplicationLib;
     struct Library *LocaleLib;
@@ -196,6 +198,16 @@ struct DockyIFace *DockyClone (struct DockyIFace *Self);
 BOOL DockyGet (struct DockyIFace *Self, uint32 msgType, uint32 *msgData);
 BOOL DockySet (struct DockyIFace *Self, uint32 msgType, uint32 msgData);
 BOOL DockyProcess (struct DockyIFace *Self, uint32 turnCount, uint32 *msgType, uint32 *msgData,
-	BOOL *anotherTurn);
+    BOOL *anotherTurn);
+
+#ifndef NDEBUG
+    #define d(a)    (a)
+    #define bug(format, ...)  ((struct ExecIFace*)((*((struct ExecBase **) 4))->MainInterface))->DebugPrintF("[X1kTemp]" format, ## __VA_ARGS__)
+#else
+    #define d(a)
+    #define bug(format, ...)
+#endif
+
+
 
 #endif

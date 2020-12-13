@@ -1,6 +1,6 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.10 (04.06.13)
+@$VER: ReadMe Guide 53.10 (30.05.15)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
@@ -20,7 +20,7 @@ température pour AmigaOne X1000@{ui}
 @{" Contact                   " link "CONTACT"}
 @{" Crédits & Remerciements   " link "CREDITS"}
 
-(c) 2013 Alexandre BALABAN
+(c) 2013-2015 Alexandre BALABAN
 
 @endnode
 
@@ -168,6 +168,10 @@ icône. Les types d'outil suivants sont disponibles :
 - SYNC_POWEROFF (ON|OFF): active ou désactive la fonction de synchronisation
   faisant que X1kTemp.docky va tenter d'inhiber toutes les partitions avant de
   démarrer la procédure d'arrêt logiciel. Par défaut la fonction est désactivée.
+- HIDE_LOCAL (ON|OFF): hides the local sensor display. By default displayed.
+- HIDE_CPU (ON|OFF): hides the CPU sensor display. By default displayed.
+- HIDE_CORE1 (ON|OFF): hides the Core1 sensor display. By default displayed.
+- HIDE_CORE2 (ON|OFF): hides the Core2 sensor display. By default displayed.
 
 Veuillez noter qu'après chaque type d'outil le type de données ou la liste des
 valeurs autorisées est indiqué entre parenthèses.
@@ -249,10 +253,15 @@ Le développement futur de ce docky inclut :
                             tooltypes
                     - (FIX) Autoinstall installs uneeded installation support
                             files
-- 53.10, xx/06/2013:- (ADD) Sync before power off feature
+- 53.10, 30/05/2015:- (ADD) Sync before power off feature
                     - (ADD) Tooltype 'SYNC_POWEROFF' to control sync
                     - (ADD) Tooltype 'CRITICAL_CHECK' to deactivate the critical
                             temperatures checks
+                    - (UPD) Finnish translation (blmara)
+                    - (FIX) CRITICAL_CMD tooltype was not taken into account
+                    - (ADD) Ability to choose which sensor to display
+                    - (ADD) Check running machine and graceful exit if it's not
+                            an AmigaOne X1000
 
 @endnode
 @node CONTACT "Contact"

@@ -1,6 +1,6 @@
 @database "ReadMe.guide"
 @author "Alexandre Balaban"
-@$VER: ReadMe Guide 53.10 (04.06.13)
+@$VER: ReadMe Guide 53.10 (30.05.15)
 @remark Created with golded 8.9 (22.3.7)
 @index INDEX
 @node MAIN "Welcome"
@@ -20,7 +20,7 @@ for the AmigaOne X1000.@{ui}
 @{" Contact Me               " link "CONTACT"}
 @{" Credits & Acknowledgments" link "CREDITS"}
 
-(c) 2013 Alexandre BALABAN
+(c) 2013-2015 Alexandre BALABAN
 
 @endnode
 
@@ -245,7 +245,7 @@ Future development of this docky involves:
                             tooltypes
                     - (FIX) Autoinstall installs uneeded installation support
                             files
-- 53.10, xx/06/2013:- (ADD) Sync before power off feature
+- 53.10, 30/05/2015:- (ADD) Sync before power off feature
                     - (ADD) Tooltype 'SYNC_POWEROFF' to control sync
                     - (ADD) Tooltype 'CRITICAL_CHECK' to deactivate the critical
                             temperatures checks
@@ -280,7 +280,7 @@ to contact me.
 * The temperature reading code was kindly provided by Thomas Frieden.
 * The power off feature is based upon code from PowerOff by Alex Carmona.
 * The icon is a courtesy of Thomas 'TommySammy' Blatt.
-* Many thanks to Guillaume 'zzd10h' Boesel for is advises and help.
+* Many thanks to Guillaume 'zzd10h' Boesel for his advises and help.
 * Thanks to Hyperion Entertainment and all AmigaOS 4 developpers for
   keeping the boing ball rolling.
 * Thanks to A-Eon Technology and Varisys for this fantastic machine that

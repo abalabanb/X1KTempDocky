@@ -11,7 +11,7 @@ RM     = delete
 
 # Change these as required
 OPTIMIZE = -O4
-DEBUG = -DNDEBUG -g
+DEBUG = -g
 CFLAGS = $(OPTIMIZE) $(DEBUG) -I. -Iinclude
 
 # Flags passed to gcc during linking
@@ -64,6 +64,7 @@ release:
 	Copy "X1kTemp Setup/" T:X1kTemp CLONE ALL FOLLOWLINKS COPYLINKS
 	Copy Catalogs T:X1kTemp/Catalogs CLONE ALL FOLLOWLINKS COPYLINKS
 	Copy "X1kTemp Setup.info" T:X1kTemp.info
+	Copy X1kTemp.docky T:X1kTemp/ CLONE ALL FOLLOWLINKS COPYLINKS
 	Delete t:X1kTemp/.svn t:X1KTemp/installwizard/.svn t:X1KTemp/installwizard/programs/.svn all
 	Rename t:X1kTemp/AutoInstall T:
 

@@ -1,6 +1,6 @@
 /*
 ** X1kTemp.docky
-** (c) 2013 Alexandre Balaban <alexandre -(@)- balaban -(.)- fr>
+** (c) 2013-2015 Alexandre Balaban <alexandre -(@)- balaban -(.)- fr>
 **
 ** Based upon Datetime.docky (c) by Fredrik Wikstrom
 **
@@ -118,14 +118,27 @@ STATIC BPTR libExpunge(struct LibraryManagerInterface *Self)
     struct DockyBase *db = (struct DockyBase *)Self->Data.LibBase;
     if (db->libNode.lib_OpenCnt == 0)
     {
-	     result = db->segList;
+        if(db->pMutex)
+        {
+            d(bug("Mutex obtaining...\n"));
+            IExec->MutexObtain(db->pMutex);
+            d(bug("Mutex obtaineded\n"));
+        }
+
+         result = db->segList;
         /* Undo what the init code did */
 
         smbus_shutdown(db);
 
-		closeLibs(db);
+        closeLibs(db);
 
         IExec->Remove((struct Node *)db);
+        if(db->pMutex)
+        {
+            d(bug("Mutex freeing...\n"));
+            IExec->FreeSysObject(ASOT_MUTEX, db->pMutex);
+            db->pMutex = NULL;
+        }
         IExec->DeleteLibrary((struct Library *)db);
     }
     else
@@ -139,92 +152,120 @@ STATIC BPTR libExpunge(struct LibraryManagerInterface *Self)
 /* The ROMTAG Init Function */
 STATIC struct Library *libInit(struct DockyBase *db, BPTR seglist, struct Interface *exec)
 {
-	db->libNode.lib_Node.ln_Type = NT_LIBRARY;
-	db->libNode.lib_Node.ln_Pri  = 0;
-	db->libNode.lib_Node.ln_Name = LIBNAME;
-	db->libNode.lib_Flags        = LIBF_SUMUSED|LIBF_CHANGED;
-	db->libNode.lib_Version      = VERSION;
-	db->libNode.lib_Revision     = REVISION;
-	db->libNode.lib_IdString     = VSTRING;
+    db->libNode.lib_Node.ln_Type = NT_LIBRARY;
+    db->libNode.lib_Node.ln_Pri  = 0;
+    db->libNode.lib_Node.ln_Name = LIBNAME;
+    db->libNode.lib_Flags        = LIBF_SUMUSED|LIBF_CHANGED;
+    db->libNode.lib_Version      = VERSION;
+    db->libNode.lib_Revision     = REVISION;
+    db->libNode.lib_IdString     = VSTRING;
 
-	db->segList = seglist;
-	IExec = (struct ExecIFace *)exec;
+    db->segList = seglist;
+    IExec = (struct ExecIFace *)exec;
 
-	if (openLibs(db)) {
-        ULONG lMachine = MACHINETYPE_UNKNOWN;
-        IExpansion->GetMachineInfoTags(GMIT_Machine,&lMachine,TAG_END);
-        if (MACHINETYPE_X1000 == lMachine)
-        {
-            if (smbus_startup(db))
-        		return &db->libNode;
+    d(bug("Lib Init with DockyBase %08x\n", db));
+
+    db->pMutex = IExec->AllocSysObjectTags(ASOT_MUTEX, ASOMUTEX_Recursive, FALSE, TAG_END);
+    if (db->pMutex)
+    {
+        d(bug("Lib Init mutex allocated, trying to obtain...\n"));
+        IExec->MutexObtain(db->pMutex);
+        d(bug("Mutex obtained\n"));
+        if (openLibs(db)) {
+            ULONG lMachine = MACHINETYPE_UNKNOWN;
+            IExpansion->GetMachineInfoTags(GMIT_Machine,&lMachine,TAG_END);
+            if (MACHINETYPE_X1000 == lMachine)
+            {
+                if (smbus_startup(db))
+                {
+                    d(bug("Mutex releasing...\n"));
+                    IExec->MutexRelease(db->pMutex);
+                    d(bug("Mutex released\n"));
+                    return &db->libNode;
+                }
+            }
+            else
+            {
+                IDOS->TimedDosRequesterTags(TDR_TitleString,    "X1KTemp - Error",
+                                            TDR_FormatString,   "X1KTemp can only operate on AmigaOne X1000.",
+                                            TDR_GadgetString,   "Exit",
+                                            TDR_ImageType,      TDRIMAGE_ERROR,
+                                            TAG_DONE);
+            }
+            closeLibs(db);
         }
-        else
-        {
-            IDOS->TimedDosRequesterTags(TDR_TitleString,    "X1KTemp - Error",
-                                        TDR_FormatString,   "X1KTemp can only operate on AmigaOne X1000.",
-                                        TDR_GadgetString,   "Exit",
-                                        TDR_ImageType,      TDRIMAGE_ERROR,
-                                        TAG_DONE);
-        }
-	}
-	closeLibs(db);
-	return NULL;
+
+        d(bug("Mutex releasing...\n"));
+        IExec->MutexRelease(db->pMutex);
+        d(bug("Mutex released\n"));
+        IExec->FreeSysObject(ASOT_MUTEX, db->pMutex);
+        db->pMutex = NULL;
+    }
+    return NULL;
 }
 
 int openLibs (struct DockyBase *db) {
-	DOSLib = IExec->OpenLibrary("dos.library", 52);
-	if (!DOSLib) return FALSE;
-	IDOS = (struct DOSIFace *)IExec->GetInterface(DOSLib, "main", 1, NULL);
-	if (!IDOS) return FALSE;
-	UtilityLib = IExec->OpenLibrary("utility.library", 52);
-	if (!UtilityLib) return FALSE;
-	IUtility = (struct UtilityIFace *)IExec->GetInterface(UtilityLib, "main", 1, NULL);
-	if (!IUtility) return FALSE;
-	IconLib = IExec->OpenLibrary("icon.library", 52);
-	if (!IconLib) return FALSE;
-	IIcon = (struct IconIFace *)IExec->GetInterface(IconLib, "main", 1, NULL);
-	if (!IIcon) return FALSE;
-	IntuitionLib = IExec->OpenLibrary("intuition.library", 52);
-	if (!IntuitionLib) return FALSE;
-	IIntuition = (struct IntuitionIFace *)IExec->GetInterface(IntuitionLib, "main", 1, NULL);
-	if (!IIntuition) return FALSE;
-	GfxLib = (struct GfxBase *)IExec->OpenLibrary("graphics.library", 52);
-	if (!GfxLib) return FALSE;
-	IGraphics = (struct GraphicsIFace *)IExec->GetInterface((struct Library *)GfxLib, "main",
-		1, NULL);
-	if (!IGraphics) return FALSE;
-	DiskfontLib = IExec->OpenLibrary("diskfont.library", 52);
-	if (!DiskfontLib) return FALSE;
-	IDiskfont = (struct DiskfontIFace *)IExec->GetInterface(DiskfontLib, "main", 1, NULL);
-	if (!IDiskfont) return FALSE;
-	ApplicationLib = IExec->OpenLibrary("application.library", 53);
-	if (!ApplicationLib) return FALSE;
-	IApplication = (struct ApplicationIFace *)IExec->GetInterface(ApplicationLib, "application", 1, NULL);
-	if (!IApplication) return FALSE;
-	ExpansionLib = IExec->OpenLibrary("expansion.library", 53);
+    d(bug("Opening libs from DockyBase %08x\n", db));
+
+    DOSLib = IExec->OpenLibrary("dos.library", 52);
+    if (!DOSLib) return FALSE;
+    IDOS = (struct DOSIFace *)IExec->GetInterface(DOSLib, "main", 1, NULL);
+    if (!IDOS) return FALSE;
+    UtilityLib = IExec->OpenLibrary("utility.library", 52);
+    if (!UtilityLib) return FALSE;
+    IUtility = (struct UtilityIFace *)IExec->GetInterface(UtilityLib, "main", 1, NULL);
+    if (!IUtility) return FALSE;
+    IconLib = IExec->OpenLibrary("icon.library", 52);
+    if (!IconLib) return FALSE;
+    IIcon = (struct IconIFace *)IExec->GetInterface(IconLib, "main", 1, NULL);
+    if (!IIcon) return FALSE;
+    IntuitionLib = IExec->OpenLibrary("intuition.library", 52);
+    if (!IntuitionLib) return FALSE;
+    IIntuition = (struct IntuitionIFace *)IExec->GetInterface(IntuitionLib, "main", 1, NULL);
+    if (!IIntuition) return FALSE;
+    GfxLib = (struct GfxBase *)IExec->OpenLibrary("graphics.library", 52);
+    if (!GfxLib) return FALSE;
+    IGraphics = (struct GraphicsIFace *)IExec->GetInterface((struct Library *)GfxLib, "main",
+        1, NULL);
+    if (!IGraphics) return FALSE;
+    DiskfontLib = IExec->OpenLibrary("diskfont.library", 52);
+    if (!DiskfontLib) return FALSE;
+    IDiskfont = (struct DiskfontIFace *)IExec->GetInterface(DiskfontLib, "main", 1, NULL);
+    if (!IDiskfont) return FALSE;
+    ApplicationLib = IExec->OpenLibrary("application.library", 53);
+    if (!ApplicationLib) return FALSE;
+    IApplication = (struct ApplicationIFace *)IExec->GetInterface(ApplicationLib, "application", 2, NULL);
+    if (!IApplication) return FALSE;
+    ExpansionLib = IExec->OpenLibrary("expansion.library", 53);
     if (!ExpansionLib) return FALSE;
     IExpansion = (struct ExpansionIFace*)IExec->GetInterface(ExpansionLib, "main", 1, NULL);
     if (!IExpansion) return FALSE;
-	return TRUE;
+
+    d(bug("Libs opened from DockyBase %08x\n", db));
+    return TRUE;
 }
 
 void closeLibs (struct DockyBase *db) {
-	if(IDiskfont) IExec->DropInterface((struct Interface *)IDiskfont);
-	if(DiskfontLib) IExec->CloseLibrary(DiskfontLib);
-	if(IGraphics) IExec->DropInterface((struct Interface *)IGraphics);
-	if(GfxLib) IExec->CloseLibrary((struct Library *)GfxLib);
-	if(IIntuition) IExec->DropInterface((struct Interface *)IIntuition);
-	if(IntuitionLib) IExec->CloseLibrary(IntuitionLib);
-	if(IIcon) IExec->DropInterface((struct Interface *)IIcon);
-	if(IconLib) IExec->CloseLibrary(IconLib);
-	if(IUtility) IExec->DropInterface((struct Interface *)IUtility);
-	if(UtilityLib) IExec->CloseLibrary(UtilityLib);
-	if(IDOS) IExec->DropInterface((struct Interface *)IDOS);
-	if(DOSLib) IExec->CloseLibrary(DOSLib);
-	if(IApplication) IExec->DropInterface((struct Interface *)IApplication);
-	if(ApplicationLib) IExec->CloseLibrary(ApplicationLib);
+    d(bug("Closing libs from DockyBase %08x\n", db));
+
+    if(IDiskfont) IExec->DropInterface((struct Interface *)IDiskfont);
+    if(DiskfontLib) IExec->CloseLibrary(DiskfontLib);
+    if(IGraphics) IExec->DropInterface((struct Interface *)IGraphics);
+    if(GfxLib) IExec->CloseLibrary((struct Library *)GfxLib);
+    if(IIntuition) IExec->DropInterface((struct Interface *)IIntuition);
+    if(IntuitionLib) IExec->CloseLibrary(IntuitionLib);
+    if(IIcon) IExec->DropInterface((struct Interface *)IIcon);
+    if(IconLib) IExec->CloseLibrary(IconLib);
+    if(IUtility) IExec->DropInterface((struct Interface *)IUtility);
+    if(UtilityLib) IExec->CloseLibrary(UtilityLib);
+    if(IDOS) IExec->DropInterface((struct Interface *)IDOS);
+    if(DOSLib) IExec->CloseLibrary(DOSLib);
+    if(IApplication) IExec->DropInterface((struct Interface *)IApplication);
+    if(ApplicationLib) IExec->CloseLibrary(ApplicationLib);
     if(IExpansion) IExec->DropInterface((struct Interface *)IExpansion);
     if(ExpansionLib) IExec->CloseLibrary(ExpansionLib);
+
+    d(bug("Libs closed from DockyBase %08x\n", db));
 }
 
 /* ------------------- Manager Interface ------------------------ */
@@ -271,8 +312,8 @@ STATIC CONST APTR docky_vectors[] =
     (APTR)DockyExpunge,
     (APTR)DockyClone,
     (APTR)DockyGet,
-	(APTR)DockySet,
-	(APTR)DockyProcess,
+    (APTR)DockySet,
+    (APTR)DockyProcess,
     (APTR)-1
 };
 
@@ -283,8 +324,8 @@ CONST struct TagItem dockyTags[] =
 {
     { MIT_Name,        (Tag)"docky"             },
     { MIT_VectorTable, (Tag)docky_vectors       },
-	{ MIT_DataSize,    sizeof(struct DockyData) },
-	{ MIT_Flags,       IFLF_PRIVATE             },
+    { MIT_DataSize,    sizeof(struct DockyData) },
+    { MIT_Flags,       IFLF_PRIVATE             },
     { MIT_Version,     1                        },
     { TAG_END,         0                        }
 };
@@ -298,12 +339,12 @@ STATIC CONST CONST_APTR libInterfaces[] =
 
 STATIC CONST struct TagItem libCreateTags[] =
 {
-    { CLT_DataSize,		sizeof(struct DockyBase) },
-    { CLT_InitFunc,		(Tag)libInit             },
-    { CLT_Interfaces,	(Tag)libInterfaces       },
+    { CLT_DataSize,     sizeof(struct DockyBase) },
+    { CLT_InitFunc,     (Tag)libInit             },
+    { CLT_Interfaces,   (Tag)libInterfaces       },
     /* Uncomment the following line if you have a 68k jump table */
-    //{ CLT_Vector68K,	(Tag)VecTable68K         },
-    { TAG_END,			0                        }
+    //{ CLT_Vector68K,  (Tag)VecTable68K         },
+    { TAG_END,          0                        }
 };
 
 

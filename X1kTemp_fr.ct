@@ -1,4 +1,4 @@
-## version $VER: X1kTemp.catalog 53.8 (13.05.2013)
+## version $VER: X1kTemp.catalog 53.9 (02.12.2018)
 ## codeset 111
 ## language french
 ;
@@ -23,7 +23,7 @@ Coeur2 %3ld°%lc
 ; Core2: %3ld°%lc
 ;
 MSG_RINGHIO_TITLE
-X1KTemp - Averstissement de température
+X1KTemp - Avertissement
 ; X1KTemp - Temperature Warning
 ;
 MSG_RINGHIO_CASE_LABEL
